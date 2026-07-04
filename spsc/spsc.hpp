@@ -1,3 +1,5 @@
+#pragma once 
+#include <cassert>
 #include <memory>
 
 template <typename T, typename Alloc = std::allocator<T>> 
@@ -20,8 +22,17 @@ class Fifo1 : private Alloc
             }
             std::allocator_traits::deallocate(*this, ring_, capacity_); 
         }
+
+        Fifo1(Fifo1 const&) = delete; 
+        Fifo1& operator=(Fifo1 const&) = delete; 
+        Fifo1(Fifo1 &&) = delete; 
+        Fifo1& operator=(Fifo1&&) = delete; 
+
         auto capacity() const {return capacity_;}
-        auto size() const {return pushCursor_ - popCursor; };
+        auto size() const {
+            assert(popCursor_ <= pushCursor_); 
+            return pushCursor_ - popCursor_; 
+        };
         auto empty() const { return size() == 0; }
         auto full() const {return size() == capacity(); }
 
