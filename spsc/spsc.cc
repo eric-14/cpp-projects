@@ -1,6 +1,8 @@
-#include "spsc.hpp"
+
 #include <vector>
 #include <print>
+#include "spsc.hpp"
+#include "workers.hpp"
 
 // erors to include 
 // -werror -wextra -wconversion address sanitizer undefined behaviour santizer 
@@ -16,22 +18,20 @@ int main()
     std::size_t capacity = 100; 
 
     Fifo1<int,std::allocator<int>> fifo(capacity);
-    std::vector<int> values{1,2,3,4,5,6,7,8,9,10}; 
+    Worker worker(fifo); 
 
-    for(std::size_t i{0}; i < values.size(); ++i)
-    {
-        fifo.push(values[i]);  
-    }
+    // std::vector<int> values{1,2,3,4,5,6,7,8,9,10}; 
 
-    while(!fifo.empty())
-    {
-        int tmp ; 
-        bool complete = fifo.pop(tmp);
-        std::size_t size = fifo.size(); 
-        std::println("value from pop is {} state of buffer {} size {}",tmp, complete, size); 
-    }
-   
+    // for(std::size_t i{0}; i < values.size(); ++i)
+    // {
+    //     fifo.push(values[i]);  
+    // }
 
-   
-    
+    // while(!fifo.empty())
+    // {
+    //     int tmp ; 
+    //     bool complete = fifo.pop(tmp);
+    //     std::size_t size = fifo.size(); 
+    //     std::println("value from pop is {} state of buffer {} size {}",tmp, complete, size); 
+    // }
 }
