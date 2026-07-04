@@ -13,14 +13,14 @@ class Fifo1 : private Alloc
 
     public: 
         explicit Fifo1(std::size_t capacity, Alloc const& alloc = Alloc{}) 
-            : Alloc(alloc), capacity_(capacity), ring_{std::allocator_traits::allocate(*this, capacity)}
+            : Alloc(alloc), capacity_(capacity), ring_{std::allocator_traits<Alloc>::allocate(*this, capacity)}
         {}
         ~Fifo1(){
             while(not empty()){
                 ring_[popCursor_ % capacity_].~T(); 
                 ++popCursor_; 
             }
-            std::allocator_traits::deallocate(*this, ring_, capacity_); 
+            std::allocator_traits<Alloc>::deallocate(*this, ring_, capacity_); 
         }
 
         Fifo1(Fifo1 const&) = delete; 
