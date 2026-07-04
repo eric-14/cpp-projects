@@ -45,7 +45,7 @@ class Fifo1 : private Alloc
             ++pushCursor_; 
             return true; 
         }
-        auto pop(T* value)
+        auto pop(T& value)
         {
             if(empty())
             {

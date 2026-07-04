@@ -1,4 +1,5 @@
 #include "spsc.hpp"
+#include <vector>
 #include <print>
 
 // erors to include 
@@ -12,4 +13,24 @@
 int main()
 {
     std::println("SPSC starting...."); 
+    std::size_t capacity = 100; 
+
+    Fifo1<int,std::allocator<int>> fifo(capacity);
+    std::vector<int> values{1,2,3,4,5,6,7,8,9,10}; 
+
+    for(std::size_t i{0}; i < values.size(); ++i)
+    {
+        fifo.push(values[i]);  
+    }
+
+    while(!fifo.empty())
+    {
+        int tmp ; 
+        fifo.pop(tmp);
+        std::println("value from pop is {}",tmp); 
+    }
+   
+
+   
+    
 }
