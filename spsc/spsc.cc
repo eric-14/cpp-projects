@@ -26,8 +26,9 @@ int main()
     while(!fifo.empty())
     {
         int tmp ; 
-        fifo.pop(tmp);
-        std::println("value from pop is {}",tmp); 
+        bool complete = fifo.pop(tmp);
+        std::size_t size = fifo.size(); 
+        std::println("value from pop is {} state of buffer {} size {}",tmp, complete, size); 
     }
    
 
