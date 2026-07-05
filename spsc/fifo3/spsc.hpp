@@ -33,31 +33,37 @@ class Fifo1 : private Alloc
         Fifo1& operator=(Fifo1&&) = delete; 
 
         auto capacity() const {return capacity_;}
-        auto size() const {
+        auto size(std::size_t pushCursor, std::size_t popCursor) const {
             assert(popCursor_ <= pushCursor_); 
             return pushCursor_ - popCursor_; 
         };
-        auto empty() const { return size() == 0; }
-        auto full() const {return size() == capacity(); }
+
+        auto empty(std::size_t pushCursor, std::size_t popCursor) const { return size(pushCursor,popCursor ) == 0; }
+        auto full(std::size_t pushCursor, std::size_t popCursor) const {return size(std::size_t pushCursor, std::size_t popCursor) == capacity(); }
 
         auto push(T const& value)
         {
-            if(full()){
+            auto pushCursor = pushCursor_.load(std::memory_order_relaxed); 
+            auto popCursor = popCursor_.load(std::memory_order_acquire); 
+
+            if(full(pushCursor, popCursor)){
                 return false; 
             }
             new(&ring_[pushCursor_ % capacity_]) T(value); 
-            ++pushCursor_; 
+            pushCursor_.store(pushCursor + 1, std::memory_order_release);  
             return true; 
         }
         auto pop(T& value)
         {
-            if(empty())
+            auto pushCursor = pushCursor_.load(std::memory_order_acquire); 
+            auto popCursor = popCursor_.load(std::memory_order_relaxed); 
+            if(empty(pushCursor,popCursor))
             {
                 return false; 
             }
             value = ring_[popCursor_ % capacity_]; 
             ring_[popCursor_ % capacity_].~T(); 
-            ++popCursor_; 
+            popCursor_.store(popCursor + 1, std::memory_order_release); 
             return true; 
         }
 
