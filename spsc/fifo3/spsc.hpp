@@ -11,6 +11,8 @@ class Fifo1 : private Alloc
     alignas(std::hardware_destructive_interference_size) std::atomic<std::size_t> pushCursor_{}; 
     alignas(std::hardware_destructive_interference_size) std::atomic<std::size_t> popCursor_{}; 
     
+    //padding to avoid false sharing with adjacent object 
+    char padding_[std::hardware_destructive_interference_size - sizeof(std::size_t)]; 
     static_assert(std::atomic<std::size_t>::is_always_lock_free,"Cursors must be atomic"); 
 
     public: 
