@@ -2,6 +2,7 @@
 #include <cassert>
 #include <atomic>
 #include <memory>
+#include <new>
 
 template <typename T, typename Alloc = std::allocator<T>> 
 class Fifo1 : private Alloc 
@@ -33,37 +34,31 @@ class Fifo1 : private Alloc
         Fifo1& operator=(Fifo1&&) = delete; 
 
         auto capacity() const {return capacity_;}
-        auto size(std::size_t pushCursor, std::size_t popCursor) const {
+        auto size() const {
             assert(popCursor_ <= pushCursor_); 
             return pushCursor_ - popCursor_; 
         };
-
-        auto empty(std::size_t pushCursor, std::size_t popCursor) const { return size(pushCursor,popCursor ) == 0; }
-        auto full(std::size_t pushCursor, std::size_t popCursor) const {return size(std::size_t pushCursor, std::size_t popCursor) == capacity(); }
+        auto empty() const { return size() == 0; }
+        auto full() const {return size() == capacity(); }
 
         auto push(T const& value)
         {
-            auto pushCursor = pushCursor_.load(std::memory_order_relaxed); 
-            auto popCursor = popCursor_.load(std::memory_order_acquire); 
-
-            if(full(pushCursor, popCursor)){
+            if(full()){
                 return false; 
             }
             new(&ring_[pushCursor_ % capacity_]) T(value); 
-            pushCursor_.store(pushCursor + 1, std::memory_order_release);  
+            ++pushCursor_; 
             return true; 
         }
         auto pop(T& value)
         {
-            auto pushCursor = pushCursor_.load(std::memory_order_acquire); 
-            auto popCursor = popCursor_.load(std::memory_order_relaxed); 
-            if(empty(pushCursor,popCursor))
+            if(empty())
             {
                 return false; 
             }
             value = ring_[popCursor_ % capacity_]; 
             ring_[popCursor_ % capacity_].~T(); 
-            popCursor_.store(popCursor + 1, std::memory_order_release); 
+            ++popCursor_; 
             return true; 
         }
 

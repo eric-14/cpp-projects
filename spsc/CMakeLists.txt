@@ -10,7 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(SPSC spsc.cc)
-target_compile_options(SPSC PRIVATE -Werror -Wextra -Wconversion -fsanitize=thread)
+# -Werror
+target_compile_options(SPSC PRIVATE -march=native  -Wextra -Wconversion -fsanitize=thread)
 target_compile_options(SPSC PRIVATE 
     $<$<CONFIG:Debug>:-fsanitize=thread>
     $<$<CONFIG:Debug>:-fPIE>

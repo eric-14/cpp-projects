@@ -4,7 +4,7 @@
 #include <thread> 
 #include <string>
 #include <print>
-#include "spsc.hpp"
+#include "./fifo3/spsc.hpp"
 
 /**
  * Worker is tightly coupled to fifo of type int
@@ -42,7 +42,7 @@ class Worker {
         {
             while(!token.stop_requested())
             {
-                std::println("Thread producer {}", prefix); 
+                //std::println("Thread producer {}", prefix); 
                 // send items 
                 std::size_t capacity = fifo.capacity(); 
                 // append(100) items
@@ -59,7 +59,7 @@ class Worker {
         {
             while(!token.stop_requested())
             {
-                std::println("Thread consumer {}", prefix);
+                //std::println("Thread consumer {}", prefix);
 
                 std::size_t capacity = fifo.capacity(); 
                 // append(100) items
@@ -67,7 +67,7 @@ class Worker {
                 {
                     int item_{}; 
                     fifo.pop(item_); 
-                    std::println("[consumer] received {}",item_); 
+                    //std::println("[consumer] received {}",item_); 
                 }
                 
             }
