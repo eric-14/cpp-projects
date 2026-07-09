@@ -69,3 +69,10 @@ While testing fifo4. A further optimized implementation which includes caching t
 
 Effect: Everything looks fine until a data race occurrs. 
 
+# Result of fifo 4 
+
+Test 4 as with other tests at low capacities the optimization results are not as clear. 
+But in higher capacities the throughput is clear. Further highlight the need to flush and warm 
+caches and pages. 
+
+![alt text](results/fifo5_test.png)
