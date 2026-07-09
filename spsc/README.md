@@ -51,3 +51,21 @@ Using simple chrono timing to test throughput. Fifo3 performs as shown below.
 
 ***Second test showing increase in performance***
 ![alt text](results/test3_fifo3.png)
+
+
+
+## Interesting Finding 
+
+
+While testing fifo4. A further optimized implementation which includes caching the pointers the thread sanitizer started yelling about a data race. This should be impossible. Turns out it is possible due to human error. Can you find woldo(the bug) in the function implementation below.  
+
+
+**Can you spot the bug. Its kinda silly.** 
+
+![alt text](results/Thread_Safety_bug.png)
+
+
+**Bug. In the pop cursor function. I was overriding the cachePopAtomic with the value of pushCursor**. 
+
+Effect: Everything looks fine until a data race occurrs. 
+

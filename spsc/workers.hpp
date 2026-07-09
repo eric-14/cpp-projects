@@ -4,7 +4,7 @@
 #include <thread> 
 #include <string>
 #include <print>
-#include "./fifo3/spsc.hpp"
+#include "./fifo4/spsc.hpp"
 
 /**
  * Worker is tightly coupled to fifo of type int

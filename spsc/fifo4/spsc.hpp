@@ -13,7 +13,7 @@ class Fifo1 : private Alloc
     alignas(std::hardware_destructive_interference_size) std::atomic<std::size_t> popCursor_{}; 
     
     //padding to avoid false sharing with adjacent object 
-    char padding_[std::hardware_destructive_interference_size - sizeof(std::size_t)]; 
+    char padding1_[std::hardware_destructive_interference_size - sizeof(std::size_t)]; 
     static_assert(std::atomic<std::size_t>::is_always_lock_free,"Cursors must be atomic"); 
 
     alignas(std::hardware_destructive_interference_size) std::size_t cachedPushCursor{}; 
@@ -24,7 +24,7 @@ class Fifo1 : private Alloc
             : Alloc(alloc), capacity_(capacity), ring_{std::allocator_traits<Alloc>::allocate(*this, capacity)}
         {}
         ~Fifo1(){
-            while(not empty()){
+            while(not empty(pushCursor_,popCursor_)){
                 ring_[popCursor_ % capacity_].~T(); 
                 ++popCursor_; 
             }
@@ -43,7 +43,7 @@ class Fifo1 : private Alloc
         };
 
         auto empty(std::size_t pushCursor, std::size_t popCursor) const { return size(pushCursor,popCursor ) == 0; }
-        auto full(std::size_t pushCursor, std::size_t popCursor) const {return size(std::size_t pushCursor, std::size_t popCursor) == capacity(); }
+        auto full(std::size_t pushCursor, std::size_t popCursor) const {return size(pushCursor, popCursor) == capacity(); }
 
         auto push(T const& value)
         {
@@ -65,8 +65,8 @@ class Fifo1 : private Alloc
             auto popCursor = popCursor_.load(std::memory_order_relaxed); 
             if(empty(cachedPopCursor,popCursor))
             {
-                cachedPopCursor = pushCursor_.load(std::memory_order_acquire); 
-                if(empty(cachedPopCursor, popCursor))
+                cachedPushCursor = pushCursor_.load(std::memory_order_acquire); 
+                if(empty(cachedPushCursor, popCursor))
                 {
                     return false; 
                 }

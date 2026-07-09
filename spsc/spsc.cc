@@ -1,7 +1,7 @@
 
 #include <vector>
 #include <print>
-#include "./fifo3/spsc.hpp"
+#include "./fifo4/spsc.hpp"
 #include "workers.hpp"
 #include <chrono>
 // erors to include 
@@ -15,7 +15,7 @@
 int main()
 {
     std::println("SPSC starting...."); 
-    std::size_t capacity = 5'000'000; 
+    std::size_t capacity = 10'000'000; 
 
     Fifo1<int,std::allocator<int>> fifo(capacity);
 
