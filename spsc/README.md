@@ -24,7 +24,30 @@ Cache value having to sync with different cachelines introducing inefficiency.
 
 ### Results 
 
+# Testing throughput in FIFO2 Atomics
+The first experiment was of fifo2 with a capacity of 1,000,000. Counterintuitively, fifo2 had increased throughput compared to fifo3. This only meant either of the following:
+- The implementation of false sharing optimization was incorrect.
+- Or the non flushed cache lines at the start of the test resulted in false sharing. 
+A simple test to validate any of the above hypothesis was to increase the capacity of the fifo, 
+if a performance increased is noticed in fifo2 then this was clear evidence that the performance decline at the start of the tests was a result of non flushed cached lines and pages and not an implementation error. 
 
-# Testing throughput in FIFO1 
+I resulted to increasing the capacity of the queue and consequently the throughput dropped. 
+
+**First test results running fifo2** 
+![alt text](results/fifo2_spsc.png)
+
+**Second test results running fifo2** 
+![alt text](results/test2_fifo_.png)
+
+**Third test results running fifo2** 
+![alt text](results/third_test_result.png)
+
+# Testing throughput in FIFO3. Optimized for false sharing 
 Using simple chrono timing to test throughput. Fifo3 performs as shown below. 
-![alt text](results/TestByWhenCacheLinesAreOptimized.png.png)
+![alt text](results/TestByWhenCacheLinesAreOptimized.png)
+
+# At a capacity of 5,000,000 the throughput significantly increases 
+![alt text](results/fifo3_test2.png)
+
+***Second test showing increase in performance***
+![alt text](results/test3_fifo3.png)

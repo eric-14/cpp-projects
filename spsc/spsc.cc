@@ -15,7 +15,7 @@
 int main()
 {
     std::println("SPSC starting...."); 
-    std::size_t capacity = 1'000'000; 
+    std::size_t capacity = 5'000'000; 
 
     Fifo1<int,std::allocator<int>> fifo(capacity);
 
