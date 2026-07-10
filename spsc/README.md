@@ -4,32 +4,34 @@ Exploration Single consumer single producer in C++.
 
 ## What is in the repo 
 
-In the repo there is a built SPSC from scratch. 
+In the following repo there is an SPSC built from ground up. 
 The fifo is replicated across 3 subfolders, each with an improved implementation.
 
 The core ideas about SPSC remain intact, with improvements on performance across the repos. 
 
-## FIFO1 
-Implements a basic fifo with a push and pop cursor 
+# FIFO1 
+Implements a basic fifo with a push and pop cursor.
 
-## FIFO2
+# FIFO2
 Implements an advanced version with atomics introducted.
 Results in a lock free SPSC but not wait free 
 
-## FIFO3 
+# FIFO3 
 
 Introduces the idea of false sharing in cache lines. 
-Cache value having to sync with different cachelines introducing inefficiency. 
+Cache line syncing introduces ineffeciencies which are eliminated. 
 
 
-### Results 
+## Results 
 
 # Testing throughput in FIFO2 Atomics
+
 The first experiment was of fifo2 with a capacity of 1,000,000. Counterintuitively, fifo2 had increased throughput compared to fifo3. This only meant either of the following:
 - The implementation of false sharing optimization was incorrect.
-- Or the non flushed cache lines at the start of the test resulted in false sharing. 
-A simple test to validate any of the above hypothesis was to increase the capacity of the fifo, 
-if a performance increased is noticed in fifo2 then this was clear evidence that the performance decline at the start of the tests was a result of non flushed cached lines and pages and not an implementation error. 
+- Or the non flushed cache lines at the start of the test resulted in cache syncing eliminating the result of optimized cache lines. 
+
+A simple test to validate any of the above hypothesis is to increase the capacity of the fifo. 
+If throughput increases in fifo2 then it is a clear evidence that the performance decline at the start of the tests was a result of non flushed cached lines and pages and not an implementation error. 
 
 I resulted to increasing the capacity of the queue and consequently the throughput dropped. 
 
