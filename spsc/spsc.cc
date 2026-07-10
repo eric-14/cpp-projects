@@ -1,8 +1,9 @@
 
 #include <vector>
 #include <print>
-#include "./fifo4/spsc.hpp"
+#include "./fifo5/spsc.hpp"
 #include "workers.hpp"
+#include <locale>
 #include <chrono>
 // erors to include 
 // -werror -wextra -wconversion address sanitizer undefined behaviour santizer 
@@ -15,22 +16,31 @@
 int main()
 {
     std::println("SPSC starting...."); 
-    std::size_t capacity = 10'000'000; 
+    std::size_t capacity = 26; 
 
     Fifo1<int,std::allocator<int>> fifo(capacity);
+
+    std::println("value of capacity {}",fifo.capacity()); 
 
     auto start_time = std::chrono::high_resolution_clock::now(); 
     Worker worker(fifo); 
     auto end_time = std::chrono::high_resolution_clock::now(); 
 
     std::chrono::duration<double> elapsed = end_time - start_time; 
-    std::size_t cap = capacity;  
+    std::size_t cap = fifo.capacity();  
     double nops = static_cast<double>(cap) / elapsed.count(); 
 
     std::println("----------------------------------------------------------------"); 
-    std::println("Number of items into the queue {} ",capacity); 
+
+    std::println("Number of items into the queue {} ",
+        std::format(std::locale("en_US.UTF-8"), "{:L}", 
+        fifo.capacity()));
+        
     std::println(" Time taken: {}",elapsed.count()); 
-    std::println(" Throughput {}",nops); 
+
+    std::println("Throughput {}",
+        std::format(std::locale("en_US.UTF-8"),"{:.4L}", 
+        nops)); 
     std::println("----------------------------------------------------------------"); 
 
 
