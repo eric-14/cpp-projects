@@ -62,3 +62,20 @@ class unique_ptr {
         }
 
 }; 
+
+
+/**
+ * TODO: 
+ * 
+ * - Add Custom deleter 
+ * - Array support 
+ * - Store pointer + deleter together 
+ * - support nullptr constructor 
+ * - Support conversion from Derived base to base 
+ * - comparison hash 
+ * - get deleter() returntthe default deleter 
+ * - make_unique
+ * 
+ * 
+ * 
+ */
