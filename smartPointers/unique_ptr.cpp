@@ -11,7 +11,7 @@ class unique_ptr {
         }
         
         T* get() const {return m_ptr;}; 
-        T* operator*() const {return m_ptr}; 
+        T* operator*() const {return *m_ptr}; 
         T* operator->() const {return m_ptr}; 
 
         //delete copy constructor 
