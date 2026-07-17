@@ -34,10 +34,19 @@ class Worker {
             }); 
 
             consume_ = std::jthread([this, &fifo](std::stop_token token) {
-                 consumer(token, "consumer", fifo); 
-            });    
+                 consumer(token, "consumer", fifo);
+            });
         }
-        
+
+        void join()
+        {
+            produce_.request_stop();
+            consume_.request_stop();
+
+            if (produce_.joinable()) produce_.join();
+            if (consume_.joinable()) consume_.join();
+        }
+
         void producer(std::stop_token token,std::string prefix, Fifo1<int, std::allocator<int>> &fifo)
         {
             while(!token.stop_requested())

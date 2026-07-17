@@ -63,7 +63,7 @@ class Fifo1 : private Alloc
         auto pop(T& value)
         {
             auto popCursor = popCursor_.load(std::memory_order_relaxed); 
-            if(empty(cachedPopCursor,popCursor))
+            if(empty(cachedPushCursor,popCursor))
             {
                 cachedPushCursor = pushCursor_.load(std::memory_order_acquire); 
                 if(empty(cachedPushCursor, popCursor))
