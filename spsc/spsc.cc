@@ -22,9 +22,9 @@ int main()
 
     std::println("value of capacity {}",fifo.capacity()); 
 
-    auto start_time = std::chrono::high_resolution_clock::now(); 
+    auto start_time = std::chrono::steady_clock::now(); 
     Worker worker(fifo); 
-    auto end_time = std::chrono::high_resolution_clock::now(); 
+    auto end_time = std::chrono::steady_clock::now(); 
 
     std::chrono::duration<double> elapsed = end_time - start_time; 
     std::size_t cap = fifo.capacity();  

@@ -9,6 +9,9 @@ The fifo is replicated across 3 subfolders, each with an improved implementation
 
 The core ideas about SPSC remain intact, with improvements on performance across the repos. 
 
+## NB: On closer review my clock might not be steady. 
+The principles still hold and I will move the codebase to gbenchmarks. 
+
 # FIFO1 
 Implements a basic fifo with a push and pop cursor.
 
