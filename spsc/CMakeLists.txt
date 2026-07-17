@@ -11,7 +11,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(SPSC spsc.cc)
 # -Werror
-target_compile_options(SPSC PRIVATE -march=native  -Wextra -Wconversion -fsanitize=thread)
+target_compile_options(SPSC PRIVATE -march=native -g -O2  -Wextra -Wconversion -fsanitize=thread)
 target_compile_options(SPSC PRIVATE 
     $<$<CONFIG:Debug>:-fsanitize=thread>
     $<$<CONFIG:Debug>:-fPIE>
