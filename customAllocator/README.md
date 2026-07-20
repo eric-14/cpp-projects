@@ -39,7 +39,6 @@ Tailor container allocation strategy at runtime through dynamic polymorphism.
 5. Type Parameter or Abstract Base 
 6. Normal Destruction or Magically Winked out. 
 
-
 ## Dimensions of Usage Scenarios 
 1. Density of allocation operations 
 2. Variation of allocated Sizes 
