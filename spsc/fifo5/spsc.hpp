@@ -1,19 +1,24 @@
 #pragma once 
 #include <cassert>
 #include <atomic>
+#include <concepts>
 #include <memory>
 
-template <typename T, typename Alloc = std::allocator<T>> 
+template <std::copyable T, typename Alloc = std::allocator<T>> 
+
 class Fifo1 : private Alloc 
 {
     std::size_t capacity_; 
+    std::size_t power; 
+    
     T* ring_; 
     char padding_[std::hardware_destructive_interference_size - sizeof(std::size_t)]; 
     alignas(std::hardware_destructive_interference_size) std::atomic<std::size_t> pushCursor_{}; 
-    alignas(std::hardware_destructive_interference_size) std::atomic<std::size_t> popCursor_{}; 
-    
+    alignas(std::hardware_destructive_interference_size) std::atomic<std::size_t> popCursor_{};
     //padding to avoid false sharing with adjacent object 
     char padding1_[std::hardware_destructive_interference_size - sizeof(std::size_t)]; 
+
+
     static_assert(std::atomic<std::size_t>::is_always_lock_free,"Cursors must be atomic"); 
 
     alignas(std::hardware_destructive_interference_size) std::size_t cachedPushCursor{}; 
@@ -85,13 +90,10 @@ class Fifo1 : private Alloc
         typedef T* Iterator; 
         Iterator cbegin() const {&ring_[0]; }
 
-        typedef T* Iterator; 
         Iterator cend() const {&ring_[0] + power; }
 
-        typedef T* Iterator; 
         Iterator begin() {&ring_[0]; }
-        
-        typedef T* Iterator; 
+         
         Iterator end() {&ring_[0] + power; }
 
 }; 
