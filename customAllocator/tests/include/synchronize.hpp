@@ -4,12 +4,12 @@
 #define DEBUG_ALLOCATOR 
 
 
-class debug_allocator :public std::pmr::memory_resource 
+class debug_resource :public std::pmr::memory_resource 
 {
     public:
 
-    explicit debug_allocator(std::string name, std::pmr::memory_resource *upstream); 
-    ~debug_allocator(); 
+    explicit debug_resource(std::string name, std::pmr::memory_resource *upstream); 
+    ~debug_resource(); 
 
 
     void* do_allocate(std::size_t bytes, std::size_t alignment) override; 

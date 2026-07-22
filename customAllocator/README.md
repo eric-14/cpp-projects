@@ -46,6 +46,8 @@ Tailor container allocation strategy at runtime through dynamic polymorphism.
 4. Utilization of allocated memory 
 5. Contention of concurrent allocations 
 
+#### Assignment does not move the allocator(c++11)
+
 
 ## Based on CppCon talk by Bob Steagall. How to write a custom allocator 
 
@@ -53,3 +55,8 @@ Tailor container allocation strategy at runtime through dynamic polymorphism.
 
 
 ***Bjarne Stroustrup***
+
+# References 
+
+1. CPPcon 2017 John Lakos "Local Arena memory allocators"
+2. CppCon 2017: Pablo Halpern. "Allocators the good parts"
