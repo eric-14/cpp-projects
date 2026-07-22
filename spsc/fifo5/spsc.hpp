@@ -24,6 +24,7 @@ class Fifo1 : private Alloc
             : Alloc(alloc)
         {
             assert(capacity % 2 == 0 &&  "Capacity should be a multiple of 2"); 
+            this->power = capacity; 
             this->capacity_ = (1 << capacity) - 1; // capcity raised by power of 2 
             ring_ = std::allocator_traits<Alloc>::allocate(*this, capacity_);
         }
@@ -81,5 +82,16 @@ class Fifo1 : private Alloc
             popCursor_.store(popCursor + 1, std::memory_order_release); 
             return true; 
         }
+        typedef T* Iterator; 
+        Iterator cbegin() const {&ring_[0]; }
+
+        typedef T* Iterator; 
+        Iterator cend() const {&ring_[0] + power; }
+
+        typedef T* Iterator; 
+        Iterator begin() {&ring_[0]; }
+        
+        typedef T* Iterator; 
+        Iterator end() {&ring_[0] + power; }
 
 }; 
