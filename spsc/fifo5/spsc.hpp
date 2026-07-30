@@ -54,7 +54,16 @@ class Fifo1 : private Alloc
         };
 
         auto empty(std::size_t pushCursor, std::size_t popCursor) const { return size(pushCursor,popCursor ) == 0; }
+        
         auto full(std::size_t pushCursor, std::size_t popCursor) const {return size(pushCursor, popCursor) == capacity(); }
+        auto empty() const {return size(pushCursor_, popCursor_) == 0; }
+        //overwritefor the current full implementation 
+        bool full() const {return size(pushCursor_, popCursor_) == capacity();}
+        //overwrite for the current size implementation 
+        auto size() const {
+            assert(popCursor_ <= pushCursor_); 
+            return pushCursor_ - popCursor_; 
+        };
 
         auto push(T const& value)
         {
@@ -88,12 +97,12 @@ class Fifo1 : private Alloc
             return true; 
         }
         typedef T* Iterator; 
-        Iterator cbegin() const {&ring_[0]; }
+        Iterator cbegin() const { return &ring_[0]; }
 
-        Iterator cend() const {&ring_[0] + power; }
+        Iterator cend() const {return &ring_[0] + power; }
 
-        Iterator begin() {&ring_[0]; }
+        Iterator begin() {return &ring_[0]; }
          
-        Iterator end() {&ring_[0] + power; }
+        Iterator end() {return &ring_[0] + power; }
 
 }; 

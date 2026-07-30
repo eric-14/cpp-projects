@@ -15,7 +15,26 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(USE_SANITIZER "NONE" CACHE STRING "Choose Sanitizer: NONE, TSAN, or UBSCAN")
 set_property(CACHE USE_SANITIZER PROPERTY STRINGS "NONE" "TSAN" "UBSAN")
 
-target_compile_options(SPSC PRIVATE -march=native -Wextra -Wconversion)
+set(RUN_TEST "FALSE" CACHE STRING "Enable testing of the system")
+set_property(CACHE RUN_TEST PROPERTY STRINGS "FALSE" "TRUE")
+#target_compile_options(SPSC PRIVATE -march=native -Wextra -Wconversion)
+
+if(RUN_TEST STREQUAL "TRUE")
+    message(STATUS "======================= RUNNING SPSC UNIT TESTS =============================================")
+    Include(FetchContent)
+
+    FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        v3.8.1 # or a later release
+    )
+
+    FetchContent_MakeAvailable(Catch2)
+
+    add_executable(Tests Tests/test_fifo5.cpp)
+    target_link_libraries(Tests PRIVATE Catch2::Catch2WithMain)
+endif()
+
 
 if(USE_SANITIZER STREQUAL "TSAN")
     message(STATUS "========================  Configuring build with ThreadSanitizer (TSAN) ================")
