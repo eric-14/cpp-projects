@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/benchmark/catch_benchmark.hpp>
 #include "../fifo5/spsc.hpp"
 
 TEST_CASE( "SPSC pushing poping functionality", "[SPSC]" ) {
@@ -88,4 +89,18 @@ TEST_CASE( "SPSC pushing poping functionality", "[SPSC]" ) {
        
         REQUIRE( spsc.size() >= 30 );
     }
+    
+    int INT_MA = 1 << 31; 
+    BENCHMARK("Benchmark for push max") {
+        spsc.push(INT_MA); 
+    };
+    BENCHMARK("Benchmark for push min") {
+        spsc.push(0); 
+    };
+    BENCHMARK("Benchmark for push and pop operation") {
+        int ret_val; 
+        spsc.pop(ret_val); 
+
+    };
+  
 }
