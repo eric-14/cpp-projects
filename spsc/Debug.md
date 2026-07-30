@@ -39,6 +39,20 @@ Thread sanitizer enabled binaries will be located in:
 
 `./build_tscan/SPSC`
 
+### Testing
+
+Current tests are based on Catch2 framework. Tests can be found in the Tests dir. They cover core functionality of the SPSC API. Which include: 
+- Iterator implementation 
+- pushing API 
+- poping API 
+- size and capacity measurement 
+
+To run compile the tests, run the commands below. 
+
+`cmake -B build_tests -DRUN_TEST=TRUE -DCMAKE_BUILD_TYPE=Debug --log-level=STATUS`
+
+`cmake --build build_tests && ./build_tests/Tests`
+
 
 ### NOTE 
 
