@@ -80,8 +80,65 @@ public:
         state = state;  
         return state; 
     }
-    [[nodiscard]] const std::string_view getId() noexcept; 
-    [[nodiscard]] const std::string_view getUserId() noexcept; 
-    [[nodiscard]] const double getFilledQuantity() noexcept; 
-    [[nodiscard]] const double getOriginalAmount() noexcept; 
+
+    [[nodiscard]] constexpr std::string_view getId() noexcept; 
+    [[nodiscard]] constexpr std::string_view getUserId() noexcept; 
+    [[nodiscard]] constexpr std::string_view getSymbol() noexcept; 
+    [[nodiscard]] constexpr double getFilledQuantity() noexcept; 
+    [[nodiscard]] constexpr double getOriginalAmount() noexcept; 
+    [[nodiscard]] constexpr double getPrice() noexcept; 
+    [[nodiscard]] constexpr OrderState getOrderState() noexcept; 
+    [[nodiscard]] constexpr OrderType getOrderType() noexcept; 
+    [[nodiscard]] constexpr std::size_t getTimestamp() noexcept; 
+
+    
 }; 
+inline std::expected<std::string_view, SystemError> state_tostring(OrderState state)
+{
+    switch(state)
+    {
+        case OrderState::FILLED: 
+            return "FILLED"; 
+        case OrderState::PARTIALLY_FILLED: 
+            return "PARTIALLY_FILLLED"; 
+        case OrderState::VALID: 
+            return "VALID"; 
+        case OrderState::INVALID: 
+            return "INVALID"; 
+        case OrderState::REJECTED: 
+            return "REJECTED"; 
+        case OrderState::CANCELED: 
+            return "CANCELED"; 
+        case OrderState::PENDING: 
+            return "PENDING"; 
+        default: 
+            std::unexpected(SystemError::UndefinedState("order state undefined")); 
+    }
+}
+
+// allocate 
+inline std::optional<bool> forrmatOrder(std::string_view output, Order &order)
+{
+    std::format("Order-ID: {} \n 
+                Order-UserID: {} \n
+                Order-Symbol: {} \n 
+                Order TimeStamp {} \n 
+                Order-State {} \n 
+                Order-Type {} \n 
+                Order-Price {} \n 
+                Order-Amount {} \n 
+                Order-FilledAmount {} \n", 
+                order.getId(),
+                order.getUserId(), 
+                order.getSymbol(), 
+                order.getTimestamp(), 
+                order.getOrderState(), 
+
+    
+    
+    )
+}
+
+} //namespace order 
+} // namespace market core 
+
