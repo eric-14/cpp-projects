@@ -3,14 +3,11 @@
 #ifndef __SYSTEM_ERROR__
 #define __SYSTEM_ERROR__
 
-#include <string>
 #include <variant>
+#include <string>
+
 
 namespace SystemError {
-
-template <typename... Fs> struct match : Fs... {
-  using Fs::operator()...;
-};
 
 struct UndefinedState {
   std::string_view error_meesage;
@@ -34,39 +31,12 @@ struct OrderValidationError {
   std::string_view error_messaege;
 };
 
-using Error =
+using OError =
     std::variant<UndefinedState, ConstructionError, OrderFillLimitError,
                  OrderEntryError, SnapFailedToSave, OrderFailedToBuild,
                  OrderValidationError>;
 
-void displayError(const Error &error) {
-  std::visit(match{
-                 [](const UndefinedState &error) {
-                   // logger.print(Undefined state.error_message)
-                 },
-                 [](const ConstructionError &error) {
-                   // logger.println(undefined state.error_messag)
-                 },
-                 [](const OrderFillLimitError &error) {
-                   // logger.println(undefined state.error_messag)
-                 },
-                 [](const OrderEntryError &error) {
-                   // logger.println(undefined state.error_messag)
-                 },
-                 [](const SnapFailedToSave &error) {
-                   // logger.println(undefined state.error_messag)
-                 },
-                 [](const OrderFailedToBuild &error) {
-                   // logger.println(undefined state.error_messag)
-                 },
-
-                 [](const OrderValidationError &error) {
-                   // logger.println(undefined state.error_messag)
-                 },
-
-             },
-             error);
-}
+void displayError(const SystemError::OError &error);
 
 } // namespace SystemError
 
