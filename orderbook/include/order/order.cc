@@ -53,8 +53,13 @@ M_CORE_O::Order::getOrderState() const noexcept {
 std::expected<double, SystemError::OrderFillLimitError>
 M_CORE_O::Order::updateFillORder(double fillAmount) {
 
-  if (m_amount > 0 && m_amount >= fillAmount) {
+  if (m_amount > 0.0 && m_amount >= fillAmount) {
     m_amount = m_amount - fillAmount;
+    if (m_amount == 0.0) {
+      m_state = OrderState::FILLED;
+    } else {
+      m_state = OrderState::PARTIALLY_FILLED;
+    }
     return m_amount;
   }
   return std::unexpected(
