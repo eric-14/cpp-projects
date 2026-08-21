@@ -5,6 +5,7 @@
 #include <expected>
 #include <format>
 #include <optional>
+#include <print>
 #include <string>
 
 namespace Market::core {
@@ -59,12 +60,14 @@ private:
   std::string m_userId;
 
 public:
-  Order(double price, double amount, OrderState state, OrderType type,
-        OrderDirection direction, OrderTimeFrame timestamp, std::string symbol,
-        std::string Id, std::string userId)
-      : m_state{state}, m_type{type}, m_frame{timestamp},
+  explicit Order(double price, double amount, OrderState state, OrderType type,
+                 OrderDirection direction, OrderTimeFrame timeframe,
+                 std::string symbol, std::string Id, std::string userId)
+      : m_state{state}, m_type{type}, m_frame{timeframe},
         m_direction{direction}, m_price{price}, m_amount{amount},
-        m_symbol{symbol}, m_Id{Id}, m_userId{userId} {}
+        m_symbol{symbol}, m_Id{Id}, m_userId{userId} {
+    m_timestamp = std::chrono::steady_clock::now();
+  }
   // Order is non copyable as it losses its information
   Order(Order &other) = delete;
   Order operator=(Order &other) = delete;
@@ -78,29 +81,57 @@ public:
     return m_state;
   }
 
-  [[nodiscard]] constexpr std::string_view getId() const noexcept;
-  [[nodiscard]] constexpr std::string_view getUserId() const noexcept;
-  [[nodiscard]] constexpr std::string_view getSymbol() const noexcept;
-  [[nodiscard]] constexpr double getFilledQuantity() const noexcept;
-  [[nodiscard]] constexpr double getOriginalAmount() const noexcept;
-  [[nodiscard]] constexpr double getPrice() const noexcept;
-  [[nodiscard]] constexpr OrderState getOrderState() const noexcept;
-  [[nodiscard]] constexpr OrderDirection getOrderDirection() const noexcept;
-  [[nodiscard]] constexpr OrderTimeFrame getExecutionTimeFrame() const noexcept;
-  [[nodiscard]] constexpr OrderType getOrderType() const noexcept;
+  [[nodiscard]] constexpr std::string_view getId() const noexcept {
+    return m_Id;
+  }
 
-  [[nodiscard]] constexpr system_time_t getTimestamp() const noexcept;
+  [[nodiscard]] constexpr std::string_view getUserId() const noexcept {
+    return m_userId;
+  }
 
-  [[nodiscard]]
+  [[nodiscard]] constexpr std::string_view getSymbol() const noexcept {
+    return m_symbol;
+  }
+
+  [[nodiscard]] constexpr double getFilledQuantity() const noexcept {
+    return m_filledQuantity;
+  }
+  [[nodiscard]] constexpr double getOriginalAmount() const noexcept {
+    return m_amount;
+  }
+
+  [[nodiscard]] constexpr double getPrice() const noexcept { return m_price; }
+
+  [[nodiscard]] constexpr system_time_t getTimeStamp() const noexcept {
+    return m_timestamp;
+  }
+
+  [[nodiscard]] constexpr OrderTimeFrame
+  getExecutionTimeFrame() const noexcept {
+    return m_frame;
+  }
+
+  [[nodiscard]] constexpr OrderType getOrderType() const noexcept {
+    return m_type;
+  }
+
+  [[nodiscard]] constexpr OrderState getOrderState() const noexcept {
+    return m_state;
+  }
+  [[nodiscard]] constexpr OrderDirection getOrderDirection() const noexcept {
+    return m_direction;
+  }
+
   std::expected<double, SystemError::OrderFillLimitError>
-  updateFillORder(double fillAmount);
+  updateFillOrder(double fillAmount);
+
   inline std::expected<std::string_view, SystemError::UndefinedState>
   stateToString() {
     switch (m_state) {
     case OrderState::FILLED:
       return "FILLED";
     case OrderState::PARTIALLY_FILLED:
-      return "PARTIALLY_FILLLED";
+      return "PARTIALLY_FILLED";
     case OrderState::VALID:
       return "VALID";
     case OrderState::INVALID:
