@@ -160,6 +160,7 @@ public:
           SystemError::UndefinedState("Order type undefined"));
     }
   }
+
   inline std::expected<std::string_view, SystemError::UndefinedState>
   directionToString() {
     switch (m_direction) {
@@ -171,6 +172,29 @@ public:
       return std::unexpected(
           SystemError::UndefinedState("Order direction undefined"));
     }
+  }
+  void printLayout() {
+    constexpr std::size_t offsetState = offsetof(Order, m_state);
+    constexpr std::size_t offsetType = offsetof(Order, m_type);
+    constexpr std::size_t offsetFrame = offsetof(Order, m_frame);
+    constexpr std::size_t offsetDirection = offsetof(Order, m_direction);
+    constexpr std::size_t offsetPrice = offsetof(Order, m_price);
+    constexpr std::size_t offsetAmount = offsetof(Order, m_amount);
+    constexpr std::size_t offsetFilled = offsetof(Order, m_filledQuantity);
+    constexpr std::size_t offsetTimestamp = offsetof(Order, m_timestamp);
+    constexpr std::size_t offsetSymbol = offsetof(Order, m_symbol);
+    constexpr std::size_t offsetId = offsetof(Order, m_Id);
+    constexpr std::size_t offsetUserID = offsetof(Order, m_userId);
+
+    std::println("========================= Class sizeof {} internals "
+                 "Information ===================",
+                 sizeof(Order));
+
+    std::println(
+        "State {} | Type {} | Frame {} | Direction {} | Price {} | Amount {} | Filled "
+        "{} | TimeStamp {} | Symbol {} | OrderBook Id {} | UserID {}",
+        offsetState, offsetType, offsetFrame, offsetDirection, offsetPrice, offsetAmount,
+        offsetFilled, offsetTimestamp, offsetSymbol, offsetId, offsetUserID);
   }
 };
 
@@ -189,7 +213,7 @@ inline std::optional<std::string_view> formatOrder(std::string_view output,
                 Order-Amount {} \n 
                 Order-FilledAmount {} \n)",
       order.getId(), order.getUserId(), order.getSymbol(),
-      order.getTimestamp().time_since_epoch(),
+      order.getTimeStamp().time_since_epoch(),
       order.stateToString().value_or(""), order.TypeToString().value_or(""),
       order.directionToString().value_or(""), order.getPrice(),
       order.getOriginalAmount(), order.getFilledQuantity());
