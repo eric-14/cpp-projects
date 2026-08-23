@@ -191,11 +191,12 @@ public:
                  "Information ===================",
                  sizeof(Order));
 
-    std::println(
-        "State {} | Type {} | Frame {} | Direction {} | Price {} | Amount {} | Filled "
-        "{} | TimeStamp {} | Symbol {} | OrderBook Id {} | UserID {}",
-        offsetState, offsetType, offsetFrame, offsetDirection, offsetPrice, offsetAmount,
-        offsetFilled, offsetTimestamp, offsetSymbol, offsetId, offsetUserID);
+    std::println("State {} | Type {} | Frame {} | Direction {} | Price {} | "
+                 "Amount {} | Filled "
+                 "{} | TimeStamp {} | Symbol {} | OrderBook Id {} | UserID {}",
+                 offsetState, offsetType, offsetFrame, offsetDirection,
+                 offsetPrice, offsetAmount, offsetFilled, offsetTimestamp,
+                 offsetSymbol, offsetId, offsetUserID);
   }
 };
 
