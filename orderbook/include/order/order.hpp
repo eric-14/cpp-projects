@@ -76,9 +76,10 @@ public:
   Order &operator=(Order &&) = default;
 
   [[nodiscard]]
-  std::optional<OrderState> updateOrderState(OrderState state) noexcept {
+  std::expected<OrderState, SystemError::OrderEntryError>
+  updateOrderState(OrderState state) noexcept {
     m_state = state;
-    return m_state;
+    return std::expected<OrderState, SystemError::OrderEntryError>(m_state);
   }
 
   [[nodiscard]] constexpr std::string_view getId() const noexcept {
