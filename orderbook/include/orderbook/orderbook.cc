@@ -72,7 +72,7 @@ MCORE_T::Orderbook::removeOrder(
 MCORE_T::Orderbook::~Orderbook() {
   Snap::snapObject tmp = this;
   /// wait for all async snapshot of the orderbook before destruction
-  bool state = m_snap->addSystem(&tmp);
+  bool state = m_snap->addSystem(tmp);
   if (state) {
     auto state = m_asyncLogger->addLog("[tm {}] Saved Orderbook");
   } else {

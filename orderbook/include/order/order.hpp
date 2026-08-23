@@ -76,9 +76,10 @@ public:
   Order &operator=(Order &&) = default;
 
   [[nodiscard]]
-  std::optional<OrderState> updateOrderState(OrderState state) noexcept {
+  std::expected<OrderState, SystemError::OrderEntryError>
+  updateOrderState(OrderState state) noexcept {
     m_state = state;
-    return m_state;
+    return std::expected<OrderState, SystemError::OrderEntryError>(m_state);
   }
 
   [[nodiscard]] constexpr std::string_view getId() const noexcept {
@@ -190,11 +191,12 @@ public:
                  "Information ===================",
                  sizeof(Order));
 
-    std::println(
-        "State {} | Type {} | Frame {} | Direction {} | Price {} | Amount {} | Filled "
-        "{} | TimeStamp {} | Symbol {} | OrderBook Id {} | UserID {}",
-        offsetState, offsetType, offsetFrame, offsetDirection, offsetPrice, offsetAmount,
-        offsetFilled, offsetTimestamp, offsetSymbol, offsetId, offsetUserID);
+    std::println("State {} | Type {} | Frame {} | Direction {} | Price {} | "
+                 "Amount {} | Filled "
+                 "{} | TimeStamp {} | Symbol {} | OrderBook Id {} | UserID {}",
+                 offsetState, offsetType, offsetFrame, offsetDirection,
+                 offsetPrice, offsetAmount, offsetFilled, offsetTimestamp,
+                 offsetSymbol, offsetId, offsetUserID);
   }
 };
 
