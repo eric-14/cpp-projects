@@ -14,9 +14,8 @@ TEST_CASE("Testing Order", "Order") {
   std::string symbol = "AAPL";
   std::string userId = "user-1";
   std::string orderID = "Order1-v1-time";
-  Order order1(30.0, 100.0, OrderState::VALID, OrderType::LIMIT,
-               OrderDirection::BID, OrderTimeFrame::GTC, symbol, orderID,
-               userId);
+  Order order1(30.0, 100.0, OrderState::VALID, OrderType::LIMIT, OrderSide::BID,
+               OrderTimeFrame::GTC, symbol, orderID, userId);
 
   order1.printLayout();
 
@@ -28,8 +27,7 @@ TEST_CASE("Testing Order", "Order") {
   REQUIRE(order1.getFilledQuantity() == 0.0);
   REQUIRE(order1.getOrderType() == OrderType::LIMIT);
   REQUIRE(order1.getOrderState() == OrderState::VALID);
-  REQUIRE(order1.getOrderDirection() ==
-          Market::core::Order::OrderDirection::BID);
+  REQUIRE(order1.getOrderSide() == Market::core::Order::OrderSide::BID);
   REQUIRE(order1.getOrderType() == OrderType::LIMIT);
   REQUIRE(order1.getExecutionTimeFrame() ==
           Market::core::Order::OrderTimeFrame::GTC);
@@ -42,17 +40,17 @@ TEST_CASE("Testing Order", "Order") {
     order1.updateOrderState(OrderState::INVALID);
     CHECK(std::string(order1.stateToString().value()) == "INVALID");
     order1.updateOrderState(OrderState::VALID);
-    CHECK(std::string(order1.stateToString().value())  == "VALID");
+    CHECK(std::string(order1.stateToString().value()) == "VALID");
     order1.updateOrderState(OrderState::REJECTED);
-    CHECK(std::string(order1.stateToString().value())  == "REJECTED");
+    CHECK(std::string(order1.stateToString().value()) == "REJECTED");
     order1.updateOrderState(OrderState::FILLED);
-    CHECK(std::string(order1.stateToString().value())  == "FILLED");
+    CHECK(std::string(order1.stateToString().value()) == "FILLED");
     order1.updateOrderState(OrderState::CANCELED);
-    CHECK(std::string(order1.stateToString().value())  == "CANCELED");
+    CHECK(std::string(order1.stateToString().value()) == "CANCELED");
     order1.updateOrderState(OrderState::PARTIALLY_FILLED);
-    CHECK(std::string(order1.stateToString().value())  == "PARTIALLY_FILLED");
+    CHECK(std::string(order1.stateToString().value()) == "PARTIALLY_FILLED");
     order1.updateOrderState(OrderState::PENDING);
-    CHECK(std::string(order1.stateToString().value())  == "PENDING");
+    CHECK(std::string(order1.stateToString().value()) == "PENDING");
   }
   SECTION("Order Update Fill Order") {
     // check if filling order behaves as expected

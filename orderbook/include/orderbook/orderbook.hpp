@@ -46,7 +46,7 @@ public:
   double getBestBid() const noexcept;
   double getSpread() const noexcept;
 
-  std::string_view getId() const noexcept;
+  constexpr std::string_view getId() const noexcept { return m_Id; };
 
   system_time_t getTimestamp() const noexcept;
 
@@ -75,7 +75,8 @@ private:
   /// Trade off is in insertion speed.
   /// Add memory preallocation
   std::flat_map<double, std::vector<std::shared_ptr<Order::Order>>>
-      m_ask; // should this be greater than
+
+      m_ask; // initial sell order has the lowest price
   std::flat_map<double, std::vector<std::shared_ptr<Order::Order>>,
                 std::greater<double>>
       m_bid;

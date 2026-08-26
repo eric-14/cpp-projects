@@ -44,12 +44,12 @@ MCORE_T::Orderbook::addOrder(std::shared_ptr<MCORE_O::Order> Order) noexcept {
   /// Add new order
   /// This should be strictly construction to a preallocated memory
 
-  auto orderDir = Order->getOrderDirection();
+  auto orderDir = Order->getOrderSide();
   double price = Order->getPrice();
-  if (orderDir == MCORE_O::OrderDirection::BID) {
+  if (orderDir == MCORE_O::OrderSide::BID) {
     m_bid[price].emplace_back(Order);
     return true;
-  } else if (orderDir == MCORE_O::OrderDirection::ASK) {
+  } else if (orderDir == MCORE_O::OrderSide::ASK) {
     m_ask[price].emplace_back(Order);
     return true;
   }
