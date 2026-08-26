@@ -25,7 +25,7 @@ enum class OrderState : std::uint8_t {
   PENDING
 };
 
-enum class OrderDirection : std::uint8_t {
+enum class OrderSide : std::uint8_t {
   BID,
   ASK,
 };
@@ -47,7 +47,7 @@ private:
   OrderState m_state;
   OrderType m_type;
   OrderTimeFrame m_frame;
-  OrderDirection m_direction;
+  OrderSide m_direction;
 
   double m_price;
   double m_amount;
@@ -61,7 +61,7 @@ private:
 
 public:
   explicit Order(double price, double amount, OrderState state, OrderType type,
-                 OrderDirection direction, OrderTimeFrame timeframe,
+                 OrderSide direction, OrderTimeFrame timeframe,
                  std::string symbol, std::string Id, std::string userId)
       : m_state{state}, m_type{type}, m_frame{timeframe},
         m_direction{direction}, m_price{price}, m_amount{amount},
@@ -119,7 +119,7 @@ public:
   [[nodiscard]] constexpr OrderState getOrderState() const noexcept {
     return m_state;
   }
-  [[nodiscard]] constexpr OrderDirection getOrderDirection() const noexcept {
+  [[nodiscard]] constexpr OrderSide getOrderSide() const noexcept {
     return m_direction;
   }
 
@@ -165,9 +165,9 @@ public:
   inline std::expected<std::string_view, SystemError::UndefinedState>
   directionToString() {
     switch (m_direction) {
-    case OrderDirection::BID:
+    case OrderSide::BID:
       return "BID";
-    case OrderDirection::ASK:
+    case OrderSide::ASK:
       return "ASK";
     default:
       return std::unexpected(
