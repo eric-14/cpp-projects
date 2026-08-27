@@ -10,17 +10,21 @@ MCORE::system_time_t MCORE_T::Orderbook::getTimestamp() const noexcept {
   return m_timestamp;
 }
 
-std::string_view MCORE_T::Orderbook::getId() const noexcept { return m_Id; }
-
 double MCORE_T::Orderbook::getBestAsk() const noexcept {
+  if (m_ask.empty())
+    return 0.0;
   return m_ask.begin()->first; // O(1) operation
 }
 
 double MCORE_T::Orderbook::getBestBid() const noexcept {
+  if (m_ask.empty())
+    return 0.0;
   return m_bid.begin()->first; // O(1) operation
 }
 
 double MCORE_T::Orderbook::getSpread() const noexcept {
+  if (m_ask.empty() || m_bid.empty())
+    return 0.0;
   return m_ask.begin()->first - m_bid.begin()->first; // O(1) operation
 }
 
