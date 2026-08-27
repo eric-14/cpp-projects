@@ -85,9 +85,15 @@ TEST_CASE( "SPSC pushing poping functionality", "[SPSC]" ) {
             int *ptr = spsc.cbegin() + k; 
             REQUIRE(  *ptr == k );
         }
+        for(int k{0}; k < 30; ++k)
+        {
+            int value; 
+            spsc.pop(value); 
+            REQUIRE(  value == k );
+        }
     
        
-        REQUIRE( spsc.size() >= 30 );
+        REQUIRE( spsc.size() == 30 );
     }
     
     int INT_MA = 1 << 31; 
