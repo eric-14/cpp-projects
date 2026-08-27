@@ -48,6 +48,7 @@ public:
   double getSpread() const noexcept;
 
   std::string_view getId() const noexcept { return m_Id; };
+  std::string_view getSymbol() const noexcept { return m_symbol; };
 
   system_time_t getTimestamp() const noexcept;
 
