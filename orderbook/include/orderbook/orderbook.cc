@@ -73,19 +73,19 @@ MCORE_T::Orderbook::removeOrder(
   */
 }
 
-MCORE_T::Orderbook::~Orderbook() {
-  Snap::snapObject tmp = this;
-  /// wait for all async snapshot of the orderbook before destruction
-  bool state = m_snap->addSystem(tmp);
-  if (state) {
-    auto state = m_asyncLogger->addLog("[tm {}] Saved Orderbook");
-  } else {
-    auto sm = m_asyncLogger->addError(SystemError::SnapFailedToSave(
-        "[] Failed to save order book on Shutdown/deletion"));
-  }
-  ///
-  system_time_t d_timestamp;
-  auto s1 = m_asyncLogger->addLog(
-      std::format("Shutting down Order book Id {} at time {}", m_Id,
-                  d_timestamp.time_since_epoch()));
-}
+// MCORE_T::Orderbook::~Orderbook() {
+//   Snap::snapObject tmp = this;
+//   /// wait for all async snapshot of the orderbook before destruction
+//   bool state = m_snap->addSystem(tmp);
+//   if (state) {
+//     auto state = m_asyncLogger->addLog("[tm {}] Saved Orderbook");
+//   } else {
+//     auto sm = m_asyncLogger->addError(SystemError::SnapFailedToSave(
+//         "[] Failed to save order book on Shutdown/deletion"));
+//   }
+//   ///
+//   system_time_t d_timestamp;
+//   auto s1 = m_asyncLogger->addLog(
+//       std::format("Shutting down Order book Id {} at time {}", m_Id,
+//                   d_timestamp.time_since_epoch()));
+// }
