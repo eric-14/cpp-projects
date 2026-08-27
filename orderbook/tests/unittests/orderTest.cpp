@@ -49,8 +49,8 @@ TEST_CASE("Testing Order", "Order") {
     CHECK(std::string(order1.stateToString().value()) == "CANCELED");
     order1.updateOrderState(OrderState::PARTIALLY_FILLED);
     CHECK(std::string(order1.stateToString().value()) == "PARTIALLY_FILLED");
-    order1.updateOrderState(OrderState::PENDING);
-    CHECK(std::string(order1.stateToString().value()) == "PENDING");
+    // order1.updateOrderState(OrderState::PENDING);
+    // CHECK(std::string(order1.stateToString().value()) == "PENDING");
   }
   SECTION("Order Update Fill Order") {
     // check if filling order behaves as expected

@@ -20,10 +20,11 @@ namespace Trading {
 /// Add allocator for maps to consume a preallocated memory chunk
 class Orderbook {
 public:
-  Orderbook(std::string Id, system_time_t timestamp)
-      : m_Id{Id}, m_timestamp{timestamp} {}
+  explicit Orderbook(std::string Id, std::string symbol,
+                     system_time_t timestamp)
+      : m_Id{Id}, m_symbol{symbol}, m_timestamp{timestamp} {}
 
-  ~Orderbook();
+  ~Orderbook() = default;
 
   Orderbook(Orderbook &) = delete;
   Orderbook operator=(Orderbook &rhs) = delete;
@@ -46,7 +47,7 @@ public:
   double getBestBid() const noexcept;
   double getSpread() const noexcept;
 
-  constexpr std::string_view getId() const noexcept { return m_Id; };
+  std::string_view getId() const noexcept { return m_Id; };
 
   system_time_t getTimestamp() const noexcept;
 
@@ -62,6 +63,7 @@ public:
 private:
   // order book Id
   std::string m_Id;
+  std::string m_symbol;
   // time of creation of orderbook
   system_time_t m_timestamp;
 
