@@ -21,8 +21,7 @@ enum class OrderState : std::uint8_t {
   VALID,
   INVALID,
   REJECTED,
-  CANCELED,
-  PENDING
+  CANCELED
 };
 
 enum class OrderSide : std::uint8_t {
@@ -141,8 +140,8 @@ public:
       return "REJECTED";
     case OrderState::CANCELED:
       return "CANCELED";
-    case OrderState::PENDING:
-      return "PENDING";
+    // case OrderState::PENDING:
+    //   return "PENDING";
     default:
       return std::unexpected(
           SystemError::UndefinedState("Order state undefined"));
