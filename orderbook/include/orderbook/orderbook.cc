@@ -10,17 +10,21 @@ MCORE::system_time_t MCORE_T::Orderbook::getTimestamp() const noexcept {
   return m_timestamp;
 }
 
-std::string_view MCORE_T::Orderbook::getId() const noexcept { return m_Id; }
-
 double MCORE_T::Orderbook::getBestAsk() const noexcept {
+  if (m_ask.empty())
+    return 0.0;
   return m_ask.begin()->first; // O(1) operation
 }
 
 double MCORE_T::Orderbook::getBestBid() const noexcept {
+  if (m_ask.empty())
+    return 0.0;
   return m_bid.begin()->first; // O(1) operation
 }
 
 double MCORE_T::Orderbook::getSpread() const noexcept {
+  if (m_ask.empty() || m_bid.empty())
+    return 0.0;
   return m_ask.begin()->first - m_bid.begin()->first; // O(1) operation
 }
 
@@ -43,18 +47,21 @@ std::expected<bool, SystemError::OrderEntryError>
 MCORE_T::Orderbook::addOrder(std::shared_ptr<MCORE_O::Order> Order) noexcept {
   /// Add new order
   /// This should be strictly construction to a preallocated memory
-
-  auto orderDir = Order->getOrderDirection();
-  double price = Order->getPrice();
-  if (orderDir == MCORE_O::OrderDirection::BID) {
-    m_bid[price].emplace_back(Order);
-    return true;
-  } else if (orderDir == MCORE_O::OrderDirection::ASK) {
-    m_ask[price].emplace_back(Order);
-    return true;
+  auto orderSymbol = Order->getSymbol();
+  if (Order->getSymbol() == m_symbol) [[likely]] {
+    auto orderDir = Order->getOrderSide();
+    double price = Order->getPrice();
+    if (orderDir == MCORE_O::OrderSide::BID) {
+      m_bid[price].emplace_back(Order);
+      return true;
+    } else if (orderDir == MCORE_O::OrderSide::ASK) {
+      m_ask[price].emplace_back(Order);
+      return true;
+    }
+  } else [[unlikely]] {
+    return std::unexpected(
+        SystemError::OrderEntryError("Failed to add order to Orderbook"));
   }
-  return std::unexpected(
-      SystemError::OrderEntryError("Failed to add order to Orderbook"));
 }
 
 std::expected<bool, SystemError::OrderEntryError>
@@ -69,19 +76,19 @@ MCORE_T::Orderbook::removeOrder(
   */
 }
 
-MCORE_T::Orderbook::~Orderbook() {
-  Snap::snapObject tmp = this;
-  /// wait for all async snapshot of the orderbook before destruction
-  bool state = m_snap->addSystem(tmp);
-  if (state) {
-    auto state = m_asyncLogger->addLog("[tm {}] Saved Orderbook");
-  } else {
-    auto sm = m_asyncLogger->addError(SystemError::SnapFailedToSave(
-        "[] Failed to save order book on Shutdown/deletion"));
-  }
-  ///
-  system_time_t d_timestamp;
-  auto s1 = m_asyncLogger->addLog(
-      std::format("Shutting down Order book Id {} at time {}", m_Id,
-                  d_timestamp.time_since_epoch()));
-}
+// MCORE_T::Orderbook::~Orderbook() {
+//   Snap::snapObject tmp = this;
+//   /// wait for all async snapshot of the orderbook before destruction
+//   bool state = m_snap->addSystem(tmp);
+//   if (state) {
+//     auto state = m_asyncLogger->addLog("[tm {}] Saved Orderbook");
+//   } else {
+//     auto sm = m_asyncLogger->addError(SystemError::SnapFailedToSave(
+//         "[] Failed to save order book on Shutdown/deletion"));
+//   }
+//   ///
+//   system_time_t d_timestamp;
+//   auto s1 = m_asyncLogger->addLog(
+//       std::format("Shutting down Order book Id {} at time {}", m_Id,
+//                   d_timestamp.time_since_epoch()));
+// }
