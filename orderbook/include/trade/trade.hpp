@@ -1,5 +1,5 @@
-#ifndef __ASYNC__
-#define __ASYNC__
+#ifndef __TRADE__
+#define __TRADE__
 
 #include "../order/order.hpp"
 #include <expected>
