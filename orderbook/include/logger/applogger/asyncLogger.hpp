@@ -12,6 +12,9 @@ public:
 
   std::expected<bool, SystemError::UndefinedState>
   addError(SystemError::OError error);
+
+private:
+  // Logger log;
 };
 } // namespace Logger
 } // namespace Market::core

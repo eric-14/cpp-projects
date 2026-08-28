@@ -1,9 +1,17 @@
 #include "../order/order.hpp"
 #include "../trade/trade.hpp"
+#include <map>
 #include <string>
 
 namespace Market::core {
 namespace Users {
+
+struct position {
+  double marketPrice;
+  double units; // amount of units in that position
+  std::string symbol;
+};
+
 class User {
 public:
   User(std::string Id, std::string name, system_time_t timestamp)
@@ -20,6 +28,8 @@ public:
   bool depositAmount(double amount) noexcept;
   bool withdrawAmount(double amount) noexcept;
 
+  bool executeOrder(Order::Order &order) noexcept;
+
 private:
   double account_amount;
   double realized_pnl;
@@ -27,6 +37,8 @@ private:
   std::string m_username;
   system_time_t m_timestamp;
   std::vector<Trading::Trade> trades; // trades done by the user
+  std::map<std::string, position>
+      m_position; // track live positions in the market
 };
 } // namespace Users
 } // namespace Market::core
