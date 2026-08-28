@@ -47,7 +47,6 @@ std::expected<bool, SystemError::OrderEntryError>
 MCORE_T::Orderbook::addOrder(std::shared_ptr<MCORE_O::Order> Order) noexcept {
   /// Add new order
   /// This should be strictly construction to a preallocated memory
-  auto orderSymbol = Order->getSymbol();
   if (Order->getSymbol() == m_symbol) [[likely]] {
     auto orderDir = Order->getOrderSide();
     double price = Order->getPrice();
