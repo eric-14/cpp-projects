@@ -75,6 +75,38 @@ MCORE_T::Orderbook::removeOrder(
   */
 }
 
+[[nodiscard]]
+std::expected<std::shared_ptr<MCORE_O::Order>, SystemError::UndefinedState>
+MCORE_T::Orderbook::findOrder(std::shared_ptr<MCORE_O::Order> Order) noexcept {
+  auto orderside = Order->getOrderSide();
+  auto orderId = Order->getId();
+  auto orderprice = Order->getPrice();
+  if (orderside == MCORE_O::OrderSide::BID) {
+    if (m_bid.empty()) {
+      return std::unexpected(SystemError::UndefinedState("Order not found"));
+    }
+    if (m_bid.find(orderprice) != m_bid.end()) [[likely]] {
+      for (const auto &order : m_bid[orderprice]) {
+        if (orderId == order->getId()) {
+          return order;
+        }
+      }
+    }
+  } else if (orderside == MCORE_O::OrderSide::ASK) {
+    if (m_ask.empty()) {
+      return std::unexpected(SystemError::UndefinedState("Order not found"));
+    }
+    if (m_ask.find(orderprice) != m_ask.end()) [[likely]] {
+      for (const auto &order : m_ask[orderprice]) {
+        if (orderId == order->getId()) {
+          return order;
+        }
+      }
+    }
+  } else [[unlikely]] {
+    return std::unexpected(SystemError::UndefinedState("Order not found"));
+  }
+}
 // MCORE_T::Orderbook::~Orderbook() {
 //   Snap::snapObject tmp = this;
 //   /// wait for all async snapshot of the orderbook before destruction

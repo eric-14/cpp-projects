@@ -22,7 +22,7 @@ class Orderbook {
 public:
   explicit Orderbook(std::string Id, std::string symbol,
                      system_time_t timestamp)
-      : m_Id{Id}, m_symbol{symbol}, m_timestamp{timestamp} {}
+      : m_Id{Id}, m_symbol{symbol}, m_timestamp{timestamp}, m_bid{}, m_ask{} {}
 
   ~Orderbook() = default;
 
@@ -38,6 +38,10 @@ public:
   [[nodiscard]]
   std::expected<bool, SystemError::OrderEntryError>
   addOrder(std::shared_ptr<Order::Order> Order) noexcept;
+
+  [[nodiscard]]
+  std::expected<std::shared_ptr<Order::Order>, SystemError::UndefinedState>
+  findOrder(std::shared_ptr<Order::Order> Order) noexcept;
 
   [[nodiscard]]
   std::expected<bool, SystemError::OrderEntryError>
