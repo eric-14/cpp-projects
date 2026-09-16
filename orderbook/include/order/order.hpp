@@ -81,6 +81,12 @@ public:
     return std::expected<OrderState, SystemError::OrderEntryError>(m_state);
   }
 
+  [[nodiscard]]
+  double updateOrderAmount(double amount) noexcept {
+    m_amount = amount;
+    return m_amount;
+  }
+
   [[nodiscard]] constexpr std::string_view getId() const noexcept {
     return m_Id;
   }
