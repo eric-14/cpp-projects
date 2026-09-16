@@ -3,7 +3,6 @@
 #include "../order/order.hpp"
 #include "../orderbook/orderbook.hpp"
 #include "../trade/trade.hpp"
-#include "../users/users.hpp"
 
 #include <cstddef>
 #include <flat_map>
