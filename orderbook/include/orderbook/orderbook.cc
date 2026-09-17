@@ -39,14 +39,14 @@ Orderbook::matchOrder(std::shared_ptr<MCORE_O::Order> order,
   auto bidCost = userquantity * userprice;
   auto userAmount = user->getAccountAmount();
 
-  if (bidCost > userAmount) {
-    status.match = false;
-    status.statusbits = 3;
-    return status;
-  }
   /// TODO: reserve memory for the vector below - prevents memory allocations
   std::vector<Trade> m_trades;
   if (userside == Order::OrderSide::BID) {
+    if (bidCost > userAmount) {
+      status.match = false;
+      status.statusbits = 3;
+      return status;
+    }
     if (m_ask.empty()) [[unlikely]] {
       status.match = false;
       return status;
