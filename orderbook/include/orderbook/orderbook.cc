@@ -107,6 +107,7 @@ Orderbook::matchOrder(std::shared_ptr<MCORE_O::Order> order,
           // Update user portfolio
           user->updatePosition(
               m_symbol, Users::position{bidCost, userquantity, m_symbol});
+          order->updateOrderState(Order::OrderState::FILLED);
 
           // create object trade
           // all bids have been filled
@@ -117,6 +118,7 @@ Orderbook::matchOrder(std::shared_ptr<MCORE_O::Order> order,
         }
       }
     }
+    order->updateOrderState(Order::OrderState::PARTIALLY_FILLED);
   } else if (userside == Order::OrderSide::ASK) {
     /// User wants to sell
     /// They should sell
@@ -184,6 +186,7 @@ Orderbook::matchOrder(std::shared_ptr<MCORE_O::Order> order,
           // Update user portfolio
           user->updatePosition(m_symbol,
                                Users::position{bidCost, bidquantity, m_symbol});
+          order->updateOrderState(Order::OrderState::FILLED);
 
           // create object trade
           // all bids have been filled
@@ -194,6 +197,7 @@ Orderbook::matchOrder(std::shared_ptr<MCORE_O::Order> order,
         }
       }
     }
+    order->updateOrderState(Order::OrderState::PARTIALLY_FILLED);
   }
 
   std::unexpected(SystemError::UndefinedState("Could not processed the order"));
