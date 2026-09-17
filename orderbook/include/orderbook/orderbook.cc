@@ -250,8 +250,7 @@ Orderbook::addOrder(std::shared_ptr<MCORE_O::Order> Order) noexcept {
 }
 
 std::expected<bool, SystemError::OrderEntryError>
-MCORE_T::Orderbook::removeOrder(
-    std::shared_ptr<MCORE_O::Order> Order) noexcept {
+Orderbook::removeOrder(std::shared_ptr<MCORE_O::Order> Order) noexcept {
   m_validationEngine->removeOrder(Order);
   /**
       One approach would be to iterate over the map and find the Order to
@@ -263,7 +262,7 @@ MCORE_T::Orderbook::removeOrder(
 
 [[nodiscard]]
 std::expected<std::shared_ptr<MCORE_O::Order>, SystemError::UndefinedState>
-MCORE_T::Orderbook::findOrder(std::shared_ptr<MCORE_O::Order> Order) noexcept {
+Orderbook::findOrder(std::shared_ptr<MCORE_O::Order> Order) noexcept {
   auto orderside = Order->getOrderSide();
   auto orderId = Order->getId();
   auto orderprice = Order->getPrice();
@@ -293,7 +292,7 @@ MCORE_T::Orderbook::findOrder(std::shared_ptr<MCORE_O::Order> Order) noexcept {
     return std::unexpected(SystemError::UndefinedState("Order not found"));
   }
 }
-// MCORE_T::Orderbook::~Orderbook() {
+// Orderbook::~Orderbook() {
 //   Snap::snapObject tmp = this;
 //   /// wait for all async snapshot of the orderbook before destruction
 //   bool state = m_snap->addSystem(tmp);
