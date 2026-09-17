@@ -3,10 +3,12 @@
 
 #include <expected>
 #include <flat_map>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "../logger/applogger/asyncLogger.hpp"
+#include "../users/users.hpp"
 #include "../utils/validationEngine/validationEngine.hpp"
 
 namespace Market::core::Snap {
@@ -15,6 +17,21 @@ class snapStore;
 namespace Market::core {
 namespace Trading {
 
+typedef struct {
+  bool match = false;
+  double numberOfTrades = 0.0;
+  double volume = 0.0; /// Number of units bought
+  uint16_t statusbits = 0;
+
+  /**
+     0 - default
+     1 - bid is lower than ask
+     2. - order has been completely matched
+     3 - user does not have enough amount to place the bid
+     4 - users ASK is higher that the highest bid prices
+  */
+
+} MatchStatus;
 /// Forward declaration of the snapstore
 
 /// Add allocator for maps to consume a preallocated memory chunk
@@ -47,6 +64,10 @@ public:
   std::expected<bool, SystemError::OrderEntryError>
   removeOrder(std::shared_ptr<Order::Order> Order) noexcept;
 
+  std::expected<MatchStatus, SystemError::UndefinedState>
+  matchOrder(std::shared_ptr<Order::Order> order,
+             std::shared_ptr<Users::User> user);
+
   double getBestAsk() const noexcept;
   double getBestBid() const noexcept;
   double getSpread() const noexcept;
@@ -58,11 +79,11 @@ public:
 
   std::string_view getOrderBookId() const noexcept;
 
-  const std::flat_map<double, std::vector<std::shared_ptr<Order::Order>>> &
+  const std::flat_map<double, std::vector<std::shared_ptr<Order::Order>>> *
   getAsk() const noexcept;
 
   const std::flat_map<double, std::vector<std::shared_ptr<Order::Order>>,
-                      std::greater<double>> &
+                      std::greater<double>> *
   getBid() const noexcept;
 
 private:

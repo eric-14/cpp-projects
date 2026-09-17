@@ -1,3 +1,6 @@
+#ifndef __USERS__
+#define __USERS__
+
 #include "../order/order.hpp"
 #include "../trade/trade.hpp"
 #include <map>
@@ -6,6 +9,7 @@
 namespace Market::core {
 namespace Users {
 
+/// Number of positions held by the user
 struct position {
   double marketPrice;
   double units; // amount of units in that position
@@ -30,6 +34,8 @@ public:
 
   bool executeOrder(Order::Order &order) noexcept;
 
+  bool updatePosition(std::string symbol, position pos) noexcept;
+
 private:
   double account_amount;
   double realized_pnl;
@@ -37,8 +43,10 @@ private:
   std::string m_username;
   system_time_t m_timestamp;
   std::vector<Trading::Trade> trades; // trades done by the user
-  std::map<std::string, position>
+  std::map<std::string, std::vector<position>>
       m_position; // track live positions in the market
 };
 } // namespace Users
 } // namespace Market::core
+
+#endif
