@@ -51,6 +51,7 @@ private:
   double m_price;
   double m_amount;
   double m_filledQuantity;
+  double m_limitprice = 0.0;
 
   system_time_t m_timestamp;
   // SSO
@@ -74,18 +75,14 @@ public:
   Order(Order &&other) = default;
   Order &operator=(Order &&) = default;
 
-  [[nodiscard]]
-  std::expected<OrderState, SystemError::OrderEntryError>
-  updateOrderState(OrderState state) noexcept {
-    m_state = state;
-    return std::expected<OrderState, SystemError::OrderEntryError>(m_state);
-  }
+  void updateOrderState(OrderState state) noexcept { m_state = state; }
 
   [[nodiscard]]
   double updateOrderAmount(double amount) noexcept {
     m_amount = amount;
     return m_amount;
   }
+  void updateLimitPrice(double price) noexcept { m_limitprice = price; }
 
   [[nodiscard]] constexpr std::string_view getId() const noexcept {
     return m_Id;
@@ -107,6 +104,9 @@ public:
   }
 
   [[nodiscard]] constexpr double getPrice() const noexcept { return m_price; }
+  [[nodiscard]] constexpr double getLimitPrice() const noexcept {
+    return m_limitprice;
+  }
 
   [[nodiscard]] constexpr system_time_t getTimeStamp() const noexcept {
     return m_timestamp;
