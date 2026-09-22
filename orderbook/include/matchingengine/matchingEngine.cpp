@@ -1,5 +1,6 @@
 #include "matchingEngine.hpp"
 #include "../trade/trade.hpp"
+#include "matchingEngineConstants.hpp"
 #include <expected>
 
 namespace Market::core::Trading {
