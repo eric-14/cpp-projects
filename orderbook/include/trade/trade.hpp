@@ -9,8 +9,9 @@ namespace Trading {
 class Trade {
 public:
   explicit Trade(double price, double quantity, system_time_t timestamp,
-                 std::string symbol, std::string userID, std::string tradeID,
-                 std::string buyOrderID, std::string sellOrderID)
+                 std::string_view symbol, std::string_view userID,
+                 std::string_view tradeID, std::string_view buyOrderID,
+                 std::string_view sellOrderID)
       : m_price{price}, m_quantity{quantity}, m_timestamp{timestamp},
         m_symbol{symbol}, m_userID{userID}, m_tradeID{tradeID},
         m_buyOrderID{buyOrderID}, m_sellOrderID{sellOrderID} {}

@@ -3,11 +3,11 @@
 namespace MCORE = Market::core;
 namespace MCORE_U = Market::core::Users;
 
-namespace Market::core {
-namespace Users {
+using namespace Market::core::Users;
 
 bool User::withdrawAmount(double amount) noexcept { account_amount -= amount; }
 bool User::depositAmount(double amount) noexcept { account_amount += amount; }
-
-} // namespace Users
-} // namespace Market::core
+bool User::updatePosition(std::string symbol, position pos) noexcept {
+  User::m_position[symbol].push_back(pos);
+  return true;
+}
