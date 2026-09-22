@@ -1,6 +1,7 @@
 #ifndef __ORDERBOOK__
 #define __ORDERBOOK__
 
+#include <cstdint>
 #include <expected>
 #include <flat_map>
 #include <memory>
@@ -18,17 +19,22 @@ namespace Market::core {
 namespace Trading {
 
 typedef struct {
-  bool match = false;
-  double numberOfTrades = 0.0;
-  double volume = 0.0; /// Number of units bought
+  uint8_t match = false;
   uint16_t statusbits = 0;
+  uint16_t numberOfTrades = 0.0;
+  uint16_t volume = 0.0; /// Number of units bought
 
   /**
-     0 - default
+  @brief BIT Representation of trade information
+     0 - Not Used
      1 - bid is lower than ask
-     2. - order has been completely matched
+     2. -order(BID/ASK) has been completely matched
      3 - user does not have enough amount to place the bid
-     4 - users ASK is higher that the highest bid prices
+     4 - users ASK is higher than the highest bid prices
+     5 - ORDER Error
+     6 - Early Termination of the trades. User ran out of funds. Partially
+     7 - market or symbol error
+     filled orders
   */
 
 } MatchStatus;
@@ -64,9 +70,11 @@ public:
   std::expected<bool, SystemError::OrderEntryError>
   removeOrder(std::shared_ptr<Order::Order> Order) noexcept;
 
-  std::expected<MatchStatus, SystemError::UndefinedState>
-  matchOrder(std::shared_ptr<Order::Order> order,
-             std::shared_ptr<Users::User> user);
+  MatchStatus matchMarketOrder(std::shared_ptr<Order::Order> order,
+                               std::shared_ptr<Users::User> user);
+
+  MatchStatus matchLimitOrder(std::shared_ptr<Order::Order> order,
+                              std::shared_ptr<Users::User> user);
 
   double getBestAsk() const noexcept;
   double getBestBid() const noexcept;
@@ -108,6 +116,7 @@ private:
   std::flat_map<double, std::vector<std::shared_ptr<Order::Order>>,
                 std::greater<double>>
       m_bid;
+  std::vector<Trade> m_trades;
 };
 
 } // namespace Trading
