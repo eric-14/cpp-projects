@@ -72,3 +72,4 @@ if(USE_SANITIZER STREQUAL "NONE")
         $<$<CONFIG:Debug>:-fsanitize=thread>
     )
 endif()
+

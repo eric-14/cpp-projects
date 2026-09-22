@@ -29,7 +29,7 @@ public:
   constexpr double getAccountAmount() const noexcept { return account_amount; };
   constexpr double getRealizedPnl() const noexcept { return realized_pnl; };
   constexpr std::vector<Trading::Trade> &getTrades() noexcept { return trades; }
-  bool depositAmount(double amount) noexcept;
+  void depositAmount(double amount) noexcept;
   bool withdrawAmount(double amount) noexcept;
 
   bool executeOrder(Order::Order &order) noexcept;
