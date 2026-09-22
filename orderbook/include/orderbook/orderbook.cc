@@ -22,16 +22,29 @@ double Orderbook::getBestAsk() const noexcept {
     return 0.0;
   return m_ask.begin()->first; // O(1) operation
 }
-std::expected<MatchStatus, SystemError::UndefinedState>
-Orderbook::matchOrder(std::shared_ptr<MCORE_O::Order> order,
-                      std::shared_ptr<Users::User> user) {
+/***
+    @brief Match bids and asks at the market price.
+           Bids are matched to the best asks and user portfolios are updated
+    @return matchstatus - contains descriptive information on the status of the
+   trades
+*/
+MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
+                                        std::shared_ptr<Users::User> user) {
   MatchStatus status;
   auto ordersym = order->getSymbol();
+  auto ordertype = order->getOrderType();
 
-  if (ordersym != m_symbol) [[unlikely]] {
-    return std::unexpected(
-        SystemError::UndefinedState("Order and Orderbook do not match"));
+  if (ordersym != m_symbol || ordertype != Order::OrderType::MARKET)
+      [[unlikely]] {
+    status.match = false;
+    status.statusbits = ORDER_ERROR | SYMBOL_OR_MARKET_ERROR;
+    return status;
   }
+  uint8_t invalidOrderState =
+      static_cast<uint8_t>(Order::OrderState::INVALID) |
+      static_cast<uint8_t>(Order::OrderState::REJECTED) |
+      static_cast<uint8_t>(Order::OrderState::FILLED) |
+      static_cast<uint8_t>(Order::OrderState::CANCELED);
 
   auto userside = order->getOrderSide();
   auto userquantity = order->getOriginalAmount();
@@ -41,14 +54,15 @@ Orderbook::matchOrder(std::shared_ptr<MCORE_O::Order> order,
   auto userAmount = user->getAccountAmount();
 
   /// TODO: reserve memory for the vector below - prevents memory allocations
-  std::vector<Trade> m_trades;
+
   if (userside == Order::OrderSide::BID) {
     if (bidCost > userAmount) {
       status.match = false;
-      status.statusbits = 3;
+      status.statusbits = INVALID_USER_AMOUNT;
       return status;
     }
     if (m_ask.empty()) [[unlikely]] {
+      status.statusbits = ORDER_FILLED;
       status.match = false;
       return status;
     }
@@ -60,19 +74,29 @@ Orderbook::matchOrder(std::shared_ptr<MCORE_O::Order> order,
       auto askprice = it->first;
       if (userprice < askprice) [[unlikely]] {
         status.match = false;
-        status.statusbits = 1;
+        status.statusbits = BID_LOWER;
         return status; // trade did not execute bid is lower than the ask
       }
 
       auto bidfill = 0.0;
+      auto askmap = it->second;
 
-      for (auto askOrder : it->second) {
-
+      for (auto askOrder : askmap) {
+        uint8_t _orderstate = static_cast<uint8_t>(askOrder->getOrderState());
+        if ((_orderstate & invalidOrderState) != 0)
+          continue;
         auto askquantity = askOrder->getOriginalAmount();
         auto askprice = askOrder->getPrice();
         userquantity -= askquantity;
 
         if (userquantity > 0) {
+          auto userPayment = user->withdrawAmount(askprice * askquantity);
+          if (!userPayment) {
+            status.statusbits =
+                INVALID_USER_AMOUNT |
+                PARTIALLY_FILLED_ORDER; /// User could not complete the orders
+            return status;
+          }
           /// TODO: check performance implication of to_string
           Trade finalizedTrade{askprice,
                                askquantity,
@@ -82,6 +106,10 @@ Orderbook::matchOrder(std::shared_ptr<MCORE_O::Order> order,
                                std::to_string(++tradeNumber),
                                order->getId(),
                                askOrder->getId()};
+          /// Order is now filled
+          askOrder->updateOrderState(Order::OrderState::FILLED);
+          /// erase the bid order from the system
+          unorderedDelete(askmap, askOrder);
 
           /// Record Trade for the system
           m_trades.emplace_back(finalizedTrade);
@@ -90,6 +118,12 @@ Orderbook::matchOrder(std::shared_ptr<MCORE_O::Order> order,
 
         // best askprice
         if (userquantity <= 0) {
+          auto userPayment = user->withdrawAmount(askprice * askquantity);
+          if (!userPayment) {
+            status.statusbits =
+                PARTIALLY_FILLED_ORDER; /// User could not complete the trades
+            return status;
+          }
           auto remainingaskamount = askquantity - userquantity;
           bool updateState = askOrder->updateOrderAmount(remainingaskamount);
           Trade finalizedTrade{askprice,

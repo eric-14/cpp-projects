@@ -17,3 +17,13 @@ The expectation is a significant increase in speed of access of the values, for 
 1. vector is a contiguos memory as compared to a map like unordered map. Note: Flat map is also contiguous. 
 2. with vector cache lines are loaded quicker as compared to general maps. 
 3. Hashing takes time. Which results in slower map data structures. 
+
+
+
+### TODO 
+1. Support for limit order and different order timeframes is insufficient 
+2. Inside validation engine. Implement a system for 
+    - sorting order per timeframe 
+    - validating the limit order against the current master ME 
+    - Sending back response to the user 
+    
