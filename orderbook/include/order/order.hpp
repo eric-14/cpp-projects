@@ -1,6 +1,7 @@
 #ifndef __ORDER__
 #define __ORDER__
 #include "../error/error.hpp"
+#include <atomic>
 #include <chrono>
 #include <expected>
 #include <format>
@@ -42,6 +43,10 @@ enum class OrderTimeFrame : std::uint8_t {
 class Order {
 
 private:
+  /// @brief Orders are shared state between multiple subsystems.
+  /// To prevent change of state while ME is processing the order the
+  // Flag isProcessing protects the order from change of state while in ME
+  std::atomic<bool> isProcessing;
   // order attributes
   OrderState m_state;
   OrderType m_type;
