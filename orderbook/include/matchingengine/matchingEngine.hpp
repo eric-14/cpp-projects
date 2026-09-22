@@ -3,7 +3,8 @@
 #include "../order/order.hpp"
 #include "../orderbook/orderbook.hpp"
 #include "../trade/trade.hpp"
-
+#include "../utils/unorderedDelete.hpp"
+#include <atomic>
 #include <cstddef>
 #include <flat_map>
 #include <map>
@@ -15,6 +16,7 @@ namespace Trading {
 
 /**
   @brief the state of the matching engine
+
         OPEN - the engine is up and running and matching trades
         CLOSED - The engine is not matching trades
         STALLED - Processing a trade
@@ -61,7 +63,7 @@ public:
   findUser(std::shared_ptr<Users::User> user);
 
 private:
-  EngineState m_engineState;
+  std::atomic<EngineState> m_engineState{EngineState::CLOSED};
   std::size_t numberOfTrades;
   std::size_t marketVolume;
   system_time_t m_timestamp;
