@@ -45,11 +45,10 @@ public:
   constexpr std::string_view getId() const noexcept { return m_Id; }
   constexpr system_time_t getTimeStamp() const noexcept { return m_timestamp; }
 
-  void addOrderBook(Orderbook &&orderbook) noexcept;
+  void addOrderBook(std::shared_ptr<Orderbook> orderbook) noexcept;
   bool removeOrderBook(std::shared_ptr<Orderbook> orderbook) noexcept;
 
-  std::optional<const Orderbook *>
-  findOrderBook(std::string_view symbol) noexcept;
+  std::shared_ptr<Orderbook> findOrderBook(std::string_view symbol) noexcept;
 
   EngineState startEngine() noexcept {
     m_engineState.store(EngineState::OPEN);
@@ -85,7 +84,8 @@ private:
   std::string m_Id;
 
   std::vector<Trading::Trade> m_trades;
-  std::flat_map<std::string_view, Orderbook> m_orderbooks;
+
+  std::flat_map<std::string_view, std::shared_ptr<Orderbook>> m_orderbooks;
   std::map<std::string_view, Users::User> m_registry;
 
   std::expected<bool, SystemError::UndefinedState>

@@ -14,10 +14,11 @@ namespace Market::core::Trading {
     same symbol
     @TODO: validate the result of the function
 */
-void matchingEngine::addOrderBook(Orderbook &&orderbook) noexcept {
-  auto symbol = orderbook.getSymbol();
+void matchingEngine::addOrderBook(
+    std::shared_ptr<Orderbook> orderbook) noexcept {
+  auto symbol = orderbook->getSymbol();
   if (m_orderbooks.find(symbol) == m_orderbooks.end()) {
-    m_orderbooks.insert_or_assign(symbol, std::move(orderbook));
+    m_orderbooks.insert_or_assign(symbol, orderbook);
   }
 }
 bool removeOrderBook(std::shared_ptr<Orderbook> orderbook) noexcept;
@@ -29,17 +30,12 @@ bool removeOrderBook(std::shared_ptr<Orderbook> orderbook) noexcept;
   @note There is a risk of pointer invalidation when new orderbooks are inserted
   in the system Validate data before the using the pointer.
 */
-std::optional<const Orderbook *>
+std::shared_ptr<Orderbook>
 matchingEngine::findOrderBook(std::string_view symbol) noexcept {
   if (m_orderbooks.find(symbol) != m_orderbooks.end()) [[likely]] {
-    auto it = m_orderbooks.find(symbol);
-    if (it != m_orderbooks.end()) {
-      return &(it->second); // Return pointer to the found Orderbook
-    }
     // return nullptr;
-    return &m_orderbooks[symbol];
+    return m_orderbooks[symbol];
   }
-  return std::nullopt;
 }
 
 std::expected<bool, SystemError::UndefinedState>
