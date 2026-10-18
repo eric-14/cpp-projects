@@ -72,7 +72,7 @@ matchingEngine::matchMarketOrder(std::shared_ptr<Order::Order> order,
   if (status.statusbits == ORDER_FILLED ||
       status.statusbits == PARTIALLY_FILLED_ORDER) {
     matchingEngine::m_numberOfTrades += status.numberOfTrades;
-    matchingEngine::m_volume += status.volume;
+    matchingEngine::m_marketVolume += status.volume;
     return true;
   }
 

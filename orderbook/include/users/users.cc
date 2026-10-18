@@ -1,10 +1,12 @@
 #include "users.hpp"
+#include <cstddef>
+#include <optional>
 
 namespace MCORE = Market::core;
 namespace MCORE_U = Market::core::Users;
 
 using namespace Market::core::Users;
-
+using namespace MCORE::Order;
 bool User::withdrawAmount(double amount) noexcept {
   if (account_amount < 0) [[unlikely]] {
     return false;

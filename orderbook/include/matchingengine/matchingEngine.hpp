@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <flat_map>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -36,20 +37,34 @@ enum class EngineState : uint8_t {
 class matchingEngine {
 public:
   constexpr std::size_t getNumberOfTrades() const noexcept {
-    return numberOfTrades;
+    return m_numberOfTrades;
   }
   constexpr std::size_t getMarketVolume() const noexcept {
-    return marketVolume;
+    return m_marketVolume;
   }
   constexpr std::string_view getId() const noexcept { return m_Id; }
   constexpr system_time_t getTimeStamp() const noexcept { return m_timestamp; }
 
-  bool addOrderBook(Orderbook &ordrbook) noexcept;
-  bool removeOrderBook(Orderbook &orderbook) noexcept;
+  void addOrderBook(Orderbook &&orderbook) noexcept;
+  bool removeOrderBook(std::shared_ptr<Orderbook> orderbook) noexcept;
 
-  bool startEngine() noexcept;
-  bool stopEngine() noexcept;
+  std::optional<const Orderbook *>
+  findOrderBook(std::string_view symbol) noexcept;
 
+  EngineState startEngine() noexcept {
+    m_engineState.store(EngineState::OPEN);
+    return m_engineState.load(std::memory_order_acquire);
+  }
+  EngineState stopEngine() noexcept {
+    m_engineState.store(EngineState::CLOSED);
+    return m_engineState.load(std::memory_order_acquire);
+  }
+  constexpr EngineState getState() noexcept {
+    return m_engineState.load(std::memory_order_relaxed);
+  }
+  constexpr std::size_t numberOfOrderbooks() noexcept {
+    return m_orderbooks.size();
+  }
   bool matchOrder(Order::Order &order, Orderbook &orderbook) noexcept;
 
   bool updateUserPosition(std::string_view userID) noexcept;
@@ -64,17 +79,14 @@ public:
 
 private:
   std::atomic<EngineState> m_engineState{EngineState::CLOSED};
-  std::size_t numberOfTrades;
-  std::size_t marketVolume;
+  std::size_t m_numberOfTrades;
+  std::size_t m_marketVolume;
   system_time_t m_timestamp;
   std::string m_Id;
 
-  long long m_numberOfTrades;
-  long long m_volume;
-
   std::vector<Trading::Trade> m_trades;
-  std::flat_map<std::string, Orderbook> m_orderbooks;
-  std::map<std::string, Users::User> m_registry;
+  std::flat_map<std::string_view, Orderbook> m_orderbooks;
+  std::map<std::string_view, Users::User> m_registry;
 
   std::expected<bool, SystemError::UndefinedState>
   matchMarketOrder(std::shared_ptr<Order::Order> order,
