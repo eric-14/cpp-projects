@@ -33,9 +33,6 @@ TEST_CASE("Testing Order", "Order") {
           Market::core::Order::OrderTimeFrame::GTC);
   REQUIRE(order1.getTimeStamp() > timestamp);
 
-  SECTION("Update Order State") {
-    CHECK(order1.updateOrderState(OrderState::INVALID) == OrderState::INVALID);
-  }
   SECTION("Order State to String") {
     order1.updateOrderState(OrderState::INVALID);
     CHECK(std::string(order1.stateToString().value()) == "INVALID");

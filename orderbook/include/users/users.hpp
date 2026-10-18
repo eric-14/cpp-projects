@@ -14,6 +14,8 @@ struct position {
   double marketPrice;
   double units; // amount of units in that position
   std::string symbol;
+  // Default unique identifier for different orders placed in the system
+  system_time_t timestamp;
 };
 
 class User {
@@ -34,7 +36,8 @@ public:
 
   bool executeOrder(Order::Order &order) noexcept;
 
-  bool updatePosition(std::string symbol, position pos) noexcept;
+  void updatePosition(std::string symbol, position pos) noexcept;
+  std::optional<std::vector<position>> findPosition(std::string symbol);
 
 private:
   double account_amount;
