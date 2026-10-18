@@ -53,9 +53,12 @@ private:
   OrderTimeFrame m_frame;
   OrderSide m_direction;
 
-  double m_price;
-  double m_amount;
-  double m_filledQuantity;
+  double m_price = 0.0;
+  ;
+  double m_amount = 0.0;
+  ;
+  double m_filledQuantity = 0.0;
+  ;
   double m_limitprice = 0.0;
 
   system_time_t m_timestamp;

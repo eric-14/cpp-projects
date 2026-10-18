@@ -21,7 +21,7 @@ struct position {
 class User {
 public:
   User(std::string Id, std::string name, system_time_t timestamp)
-      : m_timestamp{timestamp}, m_Id{Id} {}
+      : m_timestamp{timestamp}, m_username{name}, m_Id{Id} {}
 
   constexpr system_time_t getTimestamp() const noexcept { return m_timestamp; };
   constexpr std::string_view getId() const noexcept { return m_Id; };

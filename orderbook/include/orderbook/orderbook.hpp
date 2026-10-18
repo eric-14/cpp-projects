@@ -46,7 +46,7 @@ public:
   explicit Orderbook(std::string Id, std::string symbol,
                      system_time_t timestamp)
       : m_Id{Id}, m_symbol{symbol}, m_timestamp{timestamp}, m_bid{}, m_ask{} {}
-
+  Orderbook();
   ~Orderbook() = default;
 
   Orderbook(Orderbook &) = delete;

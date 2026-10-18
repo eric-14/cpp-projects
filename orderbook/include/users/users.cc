@@ -8,7 +8,7 @@ namespace MCORE_U = Market::core::Users;
 using namespace Market::core::Users;
 using namespace MCORE::Order;
 bool User::withdrawAmount(double amount) noexcept {
-  if (account_amount < 0) [[unlikely]] {
+  if (account_amount < 0 || amount > account_amount) [[unlikely]] {
     return false;
   }
   account_amount -= amount;
