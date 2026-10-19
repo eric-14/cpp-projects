@@ -17,14 +17,18 @@ using system_time_t = std::chrono::steady_clock::time_point;
 
 namespace Order {
 
-enum class OrderState : std::uint8_t {
-  FILLED,
+enum class OrderState : std::uint16_t {
+  FILLED = 0,
   PARTIALLY_FILLED,
   VALID,
   INVALID,
   REJECTED,
   CANCELED
 };
+
+constexpr uint16_t OrderStateMask(OrderState state) {
+  return 1 << static_cast<uint16_t>(state);
+}
 
 enum class OrderSide : std::uint8_t {
   BID,
@@ -34,11 +38,11 @@ enum class OrderSide : std::uint8_t {
 enum class OrderType : std::uint8_t { LIMIT, MARKET };
 
 enum class OrderTimeFrame : std::uint8_t {
-  DAYORDER, // Default order as per the SEC
-  GTC,      // Good till cancelled
-  IOC,      // Immediate or canceled. Any portion not filled should be killed
-  FOK,      // Fill or kill. Must be executed immediately in its entirety
-  AON       // All or none
+  DAYORDER = 0, // Default order as per the SEC
+  GTC,          // Good till cancelled
+  IOC, // Immediate or canceled. Any portion not filled should be killed
+  FOK, // Fill or kill. Must be executed immediately in its entirety
+  AON  // All or none
 };
 
 class Order {
@@ -55,11 +59,8 @@ private:
   OrderSide m_direction;
 
   double m_price = 0.0;
-  ;
   double m_amount = 0.0;
-  ;
   double m_filledQuantity = 0.0;
-  ;
   double m_limitprice = 0.0;
 
   system_time_t m_timestamp;

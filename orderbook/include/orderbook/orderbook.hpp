@@ -20,7 +20,7 @@ namespace Trading {
 
 typedef struct {
   uint8_t match = false;
-  STATEBITS statusbits = {};
+  STATEBITS statusbits = STATEBITS::NC;
   uint16_t numberOfTrades = 0.0;
   uint16_t volume = 0.0; /// Number of units bought
 

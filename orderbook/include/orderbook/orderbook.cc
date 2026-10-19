@@ -207,10 +207,14 @@ MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
                                bidOrder->getId(),
                                order->getId()};
           /// Order is now filled
+          order->updateOrderState(Order::OrderState::PARTIALLY_FILLED);
           bidOrder->updateOrderState(Order::OrderState::FILLED);
           /// erase the bid order from the system
           unorderedDelete(bidmap, bidOrder);
           /// Record Trade for the system
+          auto transactionAmount1 = bidquantity * order->getPrice();
+          /// Profits and loses user made while trading
+          user->depositAmount(transactionAmount1);
           m_trades.emplace_back(finalizedTrade);
           status.numberOfTrades++;
         }
@@ -237,7 +241,7 @@ MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
           // Update user portfolio
           user->updatePosition(m_symbol,
                                Users::position{bidCost, bidquantity, m_symbol});
-          if (remainingaskamount == 0) {
+          if (remainingaskamount <= 0) {
             bidOrder->updateOrderState(Order::OrderState::FILLED);
             /// erase the bid order from the system
             unorderedDelete(bidmap, bidOrder);
