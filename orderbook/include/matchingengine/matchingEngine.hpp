@@ -64,7 +64,9 @@ public:
   constexpr std::size_t numberOfOrderbooks() noexcept {
     return m_orderbooks.size();
   }
-  bool matchOrder(Order::Order &order, Orderbook &orderbook) noexcept;
+  bool matchOrder(std::shared_ptr<Order::Order> order,
+                  std::shared_ptr<Users::User> user,
+                  std::shared_ptr<Orderbook> orderbook) noexcept;
 
   bool updateUserPosition(std::string_view userID) noexcept;
   std::expected<bool, SystemError::UndefinedState>
@@ -88,10 +90,9 @@ private:
   std::flat_map<std::string_view, std::shared_ptr<Orderbook>> m_orderbooks;
   std::map<std::string_view, Users::User> m_registry;
 
-  std::expected<bool, SystemError::UndefinedState>
-  matchMarketOrder(std::shared_ptr<Order::Order> order,
-                   std::shared_ptr<Users::User> user,
-                   std::shared_ptr<Orderbook> orderbook) noexcept;
+  bool matchMarketOrder(std::shared_ptr<Order::Order> order,
+                        std::shared_ptr<Users::User> user,
+                        std::shared_ptr<Orderbook> orderbook) noexcept;
 
   bool matchLimitOrder(std::shared_ptr<Order::Order> order,
                        std::shared_ptr<Orderbook> orderbook) noexcept;
