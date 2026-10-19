@@ -3,6 +3,7 @@
 #include "../error/error.hpp"
 #include <atomic>
 #include <chrono>
+#include <cstdint>
 #include <expected>
 #include <format>
 #include <optional>

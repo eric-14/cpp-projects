@@ -63,25 +63,30 @@ bool matchingEngine::matchMarketOrder(
     switch (status.statusbits) {
 
     case STATEBITS::NC:
-      std::println("Not used");
+      std::println("Undefined State");
+      break;
     case STATEBITS::BID_LOWER:
       std::println("Bid lower than ask ");
+      break;
     case STATEBITS::ORDER_FILLED:
       std::println("BID/ASK completely filled");
+      break;
     case STATEBITS::INVALID_USER_AMOUNT:
       std::println("User does not have enough amount to place bid");
+      break;
     case STATEBITS::INVALID_ASK_PRICE:
       std::println("Ask is higher than the best bid");
+      break;
     case STATEBITS::ORDER_ERROR:
       std::println("General Order Error");
+      break;
     case STATEBITS::PARTIALLY_FILLED_ORDER:
       std::println(
           "Early termination of trade. User may have run out of funds");
+      break;
     case STATEBITS::SYMBOL_OR_MARKET_ERROR:
       std::println("market or symbol error");
-    default:
-      std::println("Out of range error status bit. Bit is {}",
-                   static_cast<uint16_t>(status.statusbits));
+      break;
     }
     /// Log why the trade could not be completed
     /// Matchstatus

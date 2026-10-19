@@ -1,16 +1,16 @@
 #ifndef __ORDERBOOK__
 #define __ORDERBOOK__
 
+#include "../logger/applogger/asyncLogger.hpp"
+#include "../matchingengine/matchingEngineConstants.hpp"
+#include "../users/users.hpp"
+#include "../utils/validationEngine/validationEngine.hpp"
 #include <cstdint>
 #include <expected>
 #include <flat_map>
 #include <memory>
 #include <string>
 #include <vector>
-
-#include "../logger/applogger/asyncLogger.hpp"
-#include "../users/users.hpp"
-#include "../utils/validationEngine/validationEngine.hpp"
 
 namespace Market::core::Snap {
 class snapStore;
@@ -20,7 +20,7 @@ namespace Trading {
 
 typedef struct {
   uint8_t match = false;
-  uint16_t statusbits = 0;
+  STATEBITS statusbits = {};
   uint16_t numberOfTrades = 0.0;
   uint16_t volume = 0.0; /// Number of units bought
 

@@ -38,13 +38,13 @@ MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
     status.match = false;
     status.statusbits =
         STATEBITS::ORDER_ERROR | STATEBITS::SYMBOL_OR_MARKET_ERROR;
+    std::println("Early return Line 41 wrong order");
     return status;
   }
-  uint8_t invalidOrderState =
-      static_cast<uint8_t>(Order::OrderState::INVALID) |
-      static_cast<uint8_t>(Order::OrderState::REJECTED) |
-      static_cast<uint8_t>(Order::OrderState::FILLED) |
-      static_cast<uint8_t>(Order::OrderState::CANCELED);
+  uint16_t invalidOrderState = OrderStateMask(Order::OrderState::INVALID) |
+                               OrderStateMask(Order::OrderState::REJECTED) |
+                               OrderStateMask(Order::OrderState::FILLED) |
+                               OrderStateMask(Order::OrderState::CANCELED);
 
   auto userside = order->getOrderSide();
   auto userquantity = order->getOriginalAmount();
@@ -82,7 +82,7 @@ MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
       auto askmap = it->second;
 
       for (auto askOrder : askmap) {
-        uint8_t _orderstate = static_cast<uint8_t>(askOrder->getOrderState());
+        uint8_t _orderstate = OrderStateMask(askOrder->getOrderState());
         if ((_orderstate & invalidOrderState) != 0)
           continue;
         auto askquantity = askOrder->getOriginalAmount();
@@ -178,16 +178,20 @@ MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
       if (userprice > bidprice) [[unlikely]] {
         status.match = false;
         status.statusbits = STATEBITS::BID_LOWER;
+        std::println("L185 Ask price is greater than bid price");
         return status; // trade did not execute bid is lower than the ask
       }
 
       auto bidfill = 0.0;
-
+      std::println("L192");
       for (auto bidOrder : bidmap) {
         /// Safety guard but ideally all FILLED Orders have been removed
         uint8_t _orderstate = static_cast<uint8_t>(bidOrder->getOrderState());
-        if ((_orderstate & invalidOrderState) != 0) [[unlikely]]
+
+        if ((_orderstate & invalidOrderState) != 0) [[unlikely]] {
           continue;
+        }
+
         auto bidquantity = bidOrder->getOriginalAmount();
         auto bidprice = bidOrder->getPrice();
         userquantity -= bidquantity;
