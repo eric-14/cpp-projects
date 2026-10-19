@@ -1,6 +1,5 @@
 #include "orderbook.hpp"
 // #include "snapStore.hpp"
-#include "../matchingengine/matchingEngineConstants.hpp"
 #include "../utils/unorderedDelete.hpp"
 #include <chrono>
 #include <cstddef>
@@ -30,14 +29,15 @@ double Orderbook::getBestAsk() const noexcept {
 */
 MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
                                         std::shared_ptr<Users::User> user) {
-  MatchStatus status;
+  MatchStatus status = {};
   auto ordersym = order->getSymbol();
   auto ordertype = order->getOrderType();
 
   if (ordersym != m_symbol || ordertype != Order::OrderType::MARKET)
       [[unlikely]] {
     status.match = false;
-    status.statusbits = ORDER_ERROR | SYMBOL_OR_MARKET_ERROR;
+    status.statusbits =
+        STATEBITS::ORDER_ERROR | STATEBITS::SYMBOL_OR_MARKET_ERROR;
     return status;
   }
   uint8_t invalidOrderState =
@@ -58,11 +58,11 @@ MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
   if (userside == Order::OrderSide::BID) {
     if (bidCost > userAmount) {
       status.match = false;
-      status.statusbits = INVALID_USER_AMOUNT;
+      status.statusbits = STATEBITS::INVALID_USER_AMOUNT;
       return status;
     }
     if (m_ask.empty()) [[unlikely]] {
-      status.statusbits = ORDER_FILLED;
+      status.statusbits = STATEBITS::ORDER_FILLED;
       status.match = false;
       return status;
     }
@@ -74,7 +74,7 @@ MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
       auto askprice = it->first;
       if (userprice < askprice) [[unlikely]] {
         status.match = false;
-        status.statusbits = BID_LOWER;
+        status.statusbits = STATEBITS::BID_LOWER;
         return status; // trade did not execute bid is lower than the ask
       }
 
@@ -93,8 +93,9 @@ MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
           auto userPayment = user->withdrawAmount(askprice * askquantity);
           if (!userPayment) {
             status.statusbits =
-                INVALID_USER_AMOUNT |
-                PARTIALLY_FILLED_ORDER; /// User could not complete the orders
+                STATEBITS::INVALID_USER_AMOUNT |
+                STATEBITS::PARTIALLY_FILLED_ORDER; /// User could not complete
+                                                   /// the orders
             return status;
           }
           /// TODO: check performance implication of to_string
@@ -121,7 +122,8 @@ MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
           auto userPayment = user->withdrawAmount(askprice * askquantity);
           if (!userPayment) {
             status.statusbits =
-                PARTIALLY_FILLED_ORDER; /// User could not complete the trades
+                STATEBITS::PARTIALLY_FILLED_ORDER; /// User could not complete
+                                                   /// the trades
             return status;
           }
           auto remainingaskamount = askquantity - userquantity;
@@ -150,7 +152,7 @@ MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
           // all bids have been filled
           status.numberOfTrades++;
           status.match = true;
-          status.statusbits = ORDER_FILLED;
+          status.statusbits = STATEBITS::ORDER_FILLED;
           return status;
         }
       }
@@ -175,7 +177,7 @@ MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
       /// Higher then the a tade cannot be made
       if (userprice > bidprice) [[unlikely]] {
         status.match = false;
-        status.statusbits = BID_LOWER;
+        status.statusbits = STATEBITS::BID_LOWER;
         return status; // trade did not execute bid is lower than the ask
       }
 
@@ -243,7 +245,7 @@ MatchStatus Orderbook::matchMarketOrder(std::shared_ptr<MCORE_O::Order> order,
           // all bids have been filled
           status.numberOfTrades++;
           status.match = true;
-          status.statusbits = ORDER_FILLED;
+          status.statusbits = STATEBITS::ORDER_FILLED;
           return status;
         }
       }
@@ -269,7 +271,7 @@ Orderbook::matchLimitOrder(std::shared_ptr<MCORE_O::Order> order,
   if (m_symbol != limitsym || ordertype != Order::OrderType::LIMIT)
       [[unlikely]] {
     status.match = false;
-    status.statusbits = ORDER_ERROR;
+    status.statusbits = STATEBITS::ORDER_ERROR;
     return status;
   }
 
@@ -283,7 +285,7 @@ Orderbook::matchLimitOrder(std::shared_ptr<MCORE_O::Order> order,
       limitState == Order::OrderState::INVALID ||
       limitState == Order::OrderState::REJECTED) [[unlikely]] {
     status.match = false;
-    status.statusbits = ORDER_ERROR;
+    status.statusbits = STATEBITS::ORDER_ERROR;
     return status;
   }
   ///

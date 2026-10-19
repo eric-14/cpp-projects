@@ -56,18 +56,39 @@ bool matchingEngine::matchMarketOrder(
   MatchStatus status = orderbook->matchMarketOrder(order, user);
 
   if (!status.match) {
-    // switch (status.statusbits) {
-    //   case 1:
+    /***
+      @TODO: Implement a better notification system.
+             The information below should be transmitted to system logs
+    */
+    switch (status.statusbits) {
 
-    //   default:
-    //     std::string
-    // }
+    case STATEBITS::NC:
+      std::println("Not used");
+    case STATEBITS::BID_LOWER:
+      std::println("Bid lower than ask ");
+    case STATEBITS::ORDER_FILLED:
+      std::println("BID/ASK completely filled");
+    case STATEBITS::INVALID_USER_AMOUNT:
+      std::println("User does not have enough amount to place bid");
+    case STATEBITS::INVALID_ASK_PRICE:
+      std::println("Ask is higher than the best bid");
+    case STATEBITS::ORDER_ERROR:
+      std::println("General Order Error");
+    case STATEBITS::PARTIALLY_FILLED_ORDER:
+      std::println(
+          "Early termination of trade. User may have run out of funds");
+    case STATEBITS::SYMBOL_OR_MARKET_ERROR:
+      std::println("market or symbol error");
+    default:
+      std::println("Out of range error status bit. Bit is {}",
+                   static_cast<uint16_t>(status.statusbits));
+    }
     /// Log why the trade could not be completed
     /// Matchstatus
     return false; // could not complete trade
   }
-  if (status.statusbits == ORDER_FILLED ||
-      status.statusbits == PARTIALLY_FILLED_ORDER) {
+  if (status.statusbits == STATEBITS::ORDER_FILLED ||
+      status.statusbits == STATEBITS::PARTIALLY_FILLED_ORDER) {
     matchingEngine::m_numberOfTrades += status.numberOfTrades;
     matchingEngine::m_marketVolume += status.volume;
     return true;
