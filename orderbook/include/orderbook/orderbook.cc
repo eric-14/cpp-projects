@@ -295,7 +295,7 @@ Orderbook::matchLimitOrder(std::shared_ptr<MCORE_O::Order> order,
 bool matchBid(std::shared_ptr<Market::core::Order::Order> order);
 
 double Orderbook::getBestBid() const noexcept {
-  if (m_ask.empty())
+  if (m_bid.empty())
     return 0.0;
   return m_bid.begin()->first; // O(1) operation
 }
