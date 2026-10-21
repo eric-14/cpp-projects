@@ -12,17 +12,7 @@ using MCOREO_O = MCORE_O::Order;
 std::expected<bool, SystemError::OrderValidationError>
 MCORE_V::validationEngine::removeOrder(std::shared_ptr<Order::Order> order) {
   uint8_t isTrue = 0;
-  auto result =
-      order->updateOrderState(MCORE_O::OrderState::INVALID)
-          .and_then([&](MCORE_O::OrderState state)
-                        -> std::expected<bool, SystemError::OrderEntryError> {
-            if (state == MCORE_O::OrderState::INVALID) [[likely]] {
-              return isTrue |= 1;
-            } else {
-              return std::unexpected(
-                  SystemError::OrderEntryError("Invalidation of Order Error"));
-            }
-          });
+  order->updateOrderState(MCORE_O::OrderState::INVALID);
   return isTrue == 1;
 }
 

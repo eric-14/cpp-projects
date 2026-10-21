@@ -14,12 +14,14 @@ struct position {
   double marketPrice;
   double units; // amount of units in that position
   std::string symbol;
+  // Default unique identifier for different orders placed in the system
+  system_time_t timestamp;
 };
 
 class User {
 public:
   User(std::string Id, std::string name, system_time_t timestamp)
-      : m_timestamp{timestamp}, m_Id{Id} {}
+      : m_timestamp{timestamp}, m_username{name}, m_Id{Id} {}
 
   constexpr system_time_t getTimestamp() const noexcept { return m_timestamp; };
   constexpr std::string_view getId() const noexcept { return m_Id; };
@@ -29,12 +31,13 @@ public:
   constexpr double getAccountAmount() const noexcept { return account_amount; };
   constexpr double getRealizedPnl() const noexcept { return realized_pnl; };
   constexpr std::vector<Trading::Trade> &getTrades() noexcept { return trades; }
-  bool depositAmount(double amount) noexcept;
+  void depositAmount(double amount) noexcept;
   bool withdrawAmount(double amount) noexcept;
 
   bool executeOrder(Order::Order &order) noexcept;
 
-  bool updatePosition(std::string symbol, position pos) noexcept;
+  void updatePosition(std::string symbol, position pos) noexcept;
+  std::optional<std::vector<position>> findPosition(std::string symbol);
 
 private:
   double account_amount;

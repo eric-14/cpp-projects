@@ -3,10 +3,12 @@
 #include "../order/order.hpp"
 #include "../orderbook/orderbook.hpp"
 #include "../trade/trade.hpp"
-
+#include "../utils/unorderedDelete.hpp"
+#include <atomic>
 #include <cstddef>
 #include <flat_map>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -15,6 +17,7 @@ namespace Trading {
 
 /**
   @brief the state of the matching engine
+
         OPEN - the engine is up and running and matching trades
         CLOSED - The engine is not matching trades
         STALLED - Processing a trade
@@ -34,21 +37,36 @@ enum class EngineState : uint8_t {
 class matchingEngine {
 public:
   constexpr std::size_t getNumberOfTrades() const noexcept {
-    return numberOfTrades;
+    return m_numberOfTrades;
   }
   constexpr std::size_t getMarketVolume() const noexcept {
-    return marketVolume;
+    return m_marketVolume;
   }
   constexpr std::string_view getId() const noexcept { return m_Id; }
   constexpr system_time_t getTimeStamp() const noexcept { return m_timestamp; }
 
-  bool addOrderBook(Orderbook &ordrbook) noexcept;
-  bool removeOrderBook(Orderbook &orderbook) noexcept;
+  void addOrderBook(std::shared_ptr<Orderbook> orderbook) noexcept;
+  bool removeOrderBook(std::shared_ptr<Orderbook> orderbook) noexcept;
 
-  bool startEngine() noexcept;
-  bool stopEngine() noexcept;
+  std::shared_ptr<Orderbook> findOrderBook(std::string_view symbol) noexcept;
 
-  bool matchOrder(Order::Order &order, Orderbook &orderbook) noexcept;
+  EngineState startEngine() noexcept {
+    m_engineState.store(EngineState::OPEN);
+    return m_engineState.load(std::memory_order_acquire);
+  }
+  EngineState stopEngine() noexcept {
+    m_engineState.store(EngineState::CLOSED);
+    return m_engineState.load(std::memory_order_acquire);
+  }
+  constexpr EngineState getState() noexcept {
+    return m_engineState.load(std::memory_order_relaxed);
+  }
+  constexpr std::size_t numberOfOrderbooks() noexcept {
+    return m_orderbooks.size();
+  }
+  bool matchOrder(std::shared_ptr<Order::Order> order,
+                  std::shared_ptr<Users::User> user,
+                  std::shared_ptr<Orderbook> orderbook) noexcept;
 
   bool updateUserPosition(std::string_view userID) noexcept;
   std::expected<bool, SystemError::UndefinedState>
@@ -61,23 +79,20 @@ public:
   findUser(std::shared_ptr<Users::User> user);
 
 private:
-  EngineState m_engineState;
-  std::size_t numberOfTrades;
-  std::size_t marketVolume;
+  std::atomic<EngineState> m_engineState{EngineState::CLOSED};
+  std::size_t m_numberOfTrades;
+  std::size_t m_marketVolume;
   system_time_t m_timestamp;
   std::string m_Id;
 
-  long long m_numberOfTrades;
-  long long m_volume;
-
   std::vector<Trading::Trade> m_trades;
-  std::flat_map<std::string, Orderbook> m_orderbooks;
-  std::map<std::string, Users::User> m_registry;
 
-  std::expected<bool, SystemError::UndefinedState>
-  matchMarketOrder(std::shared_ptr<Order::Order> order,
-                   std::shared_ptr<Users::User> user,
-                   std::shared_ptr<Orderbook> orderbook) noexcept;
+  std::flat_map<std::string_view, std::shared_ptr<Orderbook>> m_orderbooks;
+  std::map<std::string_view, Users::User> m_registry;
+
+  bool matchMarketOrder(std::shared_ptr<Order::Order> order,
+                        std::shared_ptr<Users::User> user,
+                        std::shared_ptr<Orderbook> orderbook) noexcept;
 
   bool matchLimitOrder(std::shared_ptr<Order::Order> order,
                        std::shared_ptr<Orderbook> orderbook) noexcept;

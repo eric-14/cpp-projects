@@ -1,7 +1,9 @@
 #ifndef __ORDER__
 #define __ORDER__
 #include "../error/error.hpp"
+#include <atomic>
 #include <chrono>
+#include <cstdint>
 #include <expected>
 #include <format>
 #include <optional>
@@ -15,14 +17,18 @@ using system_time_t = std::chrono::steady_clock::time_point;
 
 namespace Order {
 
-enum class OrderState : std::uint8_t {
-  FILLED,
+enum class OrderState : std::uint16_t {
+  FILLED = 0,
   PARTIALLY_FILLED,
   VALID,
   INVALID,
   REJECTED,
   CANCELED
 };
+
+constexpr uint16_t OrderStateMask(OrderState state) {
+  return 1 << static_cast<uint16_t>(state);
+}
 
 enum class OrderSide : std::uint8_t {
   BID,
@@ -32,25 +38,30 @@ enum class OrderSide : std::uint8_t {
 enum class OrderType : std::uint8_t { LIMIT, MARKET };
 
 enum class OrderTimeFrame : std::uint8_t {
-  DAYORDER, // Default order as per the SEC
-  GTC,      // Good till cancelled
-  IOC,      // Immediate or canceled. Any portion not filled should be killed
-  FOK,      // Fill or kill. Must be executed immediately in its entirety
-  AON       // All or none
+  DAYORDER = 0, // Default order as per the SEC
+  GTC,          // Good till cancelled
+  IOC, // Immediate or canceled. Any portion not filled should be killed
+  FOK, // Fill or kill. Must be executed immediately in its entirety
+  AON  // All or none
 };
 
 class Order {
 
 private:
+  /// @brief Orders are shared state between multiple subsystems.
+  /// To prevent change of state while ME is processing the order the
+  // Flag isProcessing protects the order from change of state while in ME
+  std::atomic<bool> isProcessing;
   // order attributes
   OrderState m_state;
   OrderType m_type;
   OrderTimeFrame m_frame;
   OrderSide m_direction;
 
-  double m_price;
-  double m_amount;
-  double m_filledQuantity;
+  double m_price = 0.0;
+  double m_amount = 0.0;
+  double m_filledQuantity = 0.0;
+  double m_limitprice = 0.0;
 
   system_time_t m_timestamp;
   // SSO
@@ -74,18 +85,14 @@ public:
   Order(Order &&other) = default;
   Order &operator=(Order &&) = default;
 
-  [[nodiscard]]
-  std::expected<OrderState, SystemError::OrderEntryError>
-  updateOrderState(OrderState state) noexcept {
-    m_state = state;
-    return std::expected<OrderState, SystemError::OrderEntryError>(m_state);
-  }
+  void updateOrderState(OrderState state) noexcept { m_state = state; }
 
   [[nodiscard]]
   double updateOrderAmount(double amount) noexcept {
     m_amount = amount;
     return m_amount;
   }
+  void updateLimitPrice(double price) noexcept { m_limitprice = price; }
 
   [[nodiscard]] constexpr std::string_view getId() const noexcept {
     return m_Id;
@@ -107,6 +114,9 @@ public:
   }
 
   [[nodiscard]] constexpr double getPrice() const noexcept { return m_price; }
+  [[nodiscard]] constexpr double getLimitPrice() const noexcept {
+    return m_limitprice;
+  }
 
   [[nodiscard]] constexpr system_time_t getTimeStamp() const noexcept {
     return m_timestamp;
